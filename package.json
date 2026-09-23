@@ -1,0 +1,27 @@
+{
+  "name": "giraffe-bio-socialmedia",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5187 --strictPort",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4187 --strictPort",
+    "check": "tsc --noEmit",
+    "shots": "node scripts/review.mjs"
+  },
+  "dependencies": {
+    "three": "0.185.1",
+    "polygon-clipping": "0.15.7"
+  },
+  "devDependencies": {
+    "@types/three": "0.185.4",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.0",
+    "playwright-core": "^1.62.1"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "packageManager": "pnpm@11.20.0"
+}

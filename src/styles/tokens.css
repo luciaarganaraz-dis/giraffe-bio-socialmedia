@@ -1,0 +1,18 @@
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #353636;
+  background: #f8f7f3;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  --ink: #353636;
+  --muted: #777973;
+  --paper: #f8f7f3;
+  --stage: #f1f0eb;
+  --rule: #dadbd3;
+  --accent: #a75c40;
+  --white: #ffffff;
+  --copper: #bd7757;
+  --ivory: #dfddcf;
+  --space: clamp(20px, 3.2vw, 48px);
+  --duration: 180ms;
+}
