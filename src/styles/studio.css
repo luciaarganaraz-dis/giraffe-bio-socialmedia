@@ -111,7 +111,7 @@ footer { margin: 12px var(--space) 0; border-top: 1px solid var(--rule); display
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
 
-.stage[data-surface='stone'] { background: radial-gradient(ellipse at 35% 25%, #272a2e, var(--stone-stage) 78%); border-color: var(--stone-stage); }
-.stage[data-surface='stone'] .stage-top, .stage[data-surface='stone'] .stage-top > :last-child,
-.stage[data-surface='stone'] .stage-bottom { color: var(--stone-label); }
-.stage[data-surface='stone']::before, .stage[data-surface='stone']::after { color: var(--stone-label); }
+.stage { background: radial-gradient(ellipse at 35% 25%, #272a2e, var(--stone-stage) 78%); border-color: var(--stone-stage); }
+.stage .stage-top, .stage .stage-top > :last-child,
+.stage .stage-bottom { color: var(--stone-label); }
+.stage::before, .stage::after { color: var(--stone-label); }

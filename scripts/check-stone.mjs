@@ -17,6 +17,7 @@ try {
   assert.ok(Number(await page.locator('#viewer').getAttribute('data-relief')) > .12, 'Stone must have physically displaced front faces')
   await page.screenshot({ path: '.review/stone-logo.png', fullPage: true })
   await page.locator('canvas').screenshot({ path: '.review/stone-source.png' })
+  await page.locator('#transparent').check()
   for (const format of ['image', 'model']) {
     const [download] = await Promise.all([page.waitForEvent('download', { timeout: 60000 }), page.locator(`#export-${format}`).click()])
     await download.saveAs(`exports/giraffe-bio-logo-stone.${format === 'image' ? 'png' : 'glb'}`)

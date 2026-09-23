@@ -19,7 +19,9 @@ Abrir **http://127.0.0.1:5187**. El servidor usa un puerto fijo y sólo escucha 
 - Alternar entre el logo completo y las cinco piezas del isotipo.
 - Elegir piedra (acabado inicial), grafito, cobre o marfil y ajustar la profundidad.
 - Pausar el movimiento y restablecer la vista.
-- Descargar PNG: 3000 × 1500 para el logo o 2048 × 2048 para el isotipo, con fondo transparente opcional.
+- Trabajar la luz en el panel debajo del visor: arrastrar el punto para mover la fuente principal; ajustar intensidad, relleno, contraluz y exposición. Las flechas del teclado también mueven el punto.
+- «Restablecer luz» recupera los valores iniciales sin cambiar el encuadre. Los ajustes se conservan al cambiar de material o pieza.
+- Descargar PNG: 3000 × 1500 para el logo o 2048 × 2048 para el isotipo, con fondo de piedra y la iluminación elegida; transparencia opcional.
 - Descargar GLB: geometría y materiales, para abrir en Blender u otra herramienta 3D. El GLB de piedra incorpora mapas de color, relieve y rugosidad/metallicidad horneados a 2048 px desde el acabado de piedra gris. El grano fino puede verse más suave que en el shader vivo. El GLB contiene la pieza centrada; no incorpora el fondo, la cámara ni la iluminación del estudio.
 - Con el visor enfocado: flechas para girar, `+` / `−` para acercar y `Home` para restablecer.
 
@@ -31,12 +33,14 @@ El movimiento automático se desactiva al manipular la pieza. Se respeta la pref
 - `src/logo.ts`: unión de trazos superpuestos, extrusión, bisel y normales suavizadas.
 - `src/studio.ts`: cámara, iluminación, interacción y captura.
 - `src/materials.ts`: acabados de la pieza.
+- `src/lighting.ts` y `src/light-controls.ts`: luces del estudio y panel de edición.
+- `src/stone/backdrop.ts`: pared de piedra con relieve, material y sombras.
 - `src/styles/`: composición y colores del estudio.
 - `src/stone/sculpt.ts`: subdivisión y erosión real de caras, bordes y paredes.
 - `src/stone/carved-look.ts`: gris mineral, poros y luces del acabado actual.
 - `src/stone/`: shader base del sitio y conversión a texturas PBR para GLB.
 - `public/rock/`: mapas de relieve y ARM, más el entorno de iluminación original.
-- `exports/`: logo en piedra y grafito (GLB y PNG transparente), más isotipo en cobre.
+- `exports/`: logo en piedra y grafito (GLB y PNG transparente), más isotipo en cobre y PNG del logo sobre fondo de piedra.
 
 El estudio usa Vite, TypeScript y Three.js. No necesita claves, servicios externos ni imágenes generadas. Los archivos se exportan en el navegador.
 
@@ -63,3 +67,11 @@ pnpm check:stone
 ```
 
 Esta prueba se concentra en la pieza para redes: captura el logo y el isotipo, descarga PNG y GLB, mide el relieve físico, verifica sus texturas incorporadas y vuelve a abrir el GLB tanto con el acabado PBR como con un material neutro sin texturas para revisar la geometría. Requiere el servidor local abierto y Chrome. Las capturas quedan en `.review/stone-*.png`.
+
+## Fondo y luz
+
+El fondo es una malla de piedra iluminada dentro de la escena, con relieve y sombra del logo. Reutiliza los mapas existentes y deforma sus coordenadas para romper la repetición. La fuente principal se mueve respecto de la cámara; izquierda en el control corresponde a izquierda en el visor.
+
+El PNG incluye fondo e iluminación. Activar «PNG con fondo transparente» elimina temporalmente la pared durante la captura y luego la restaura en el visor. El GLB sigue exportando únicamente la pieza con sus materiales, sin pared, luces ni cámara.
+
+`pnpm check:lighting` verifica cambios reales de luminosidad, arrastre y teclado, restablecimiento, y PNG con fondo y transparencia. Guarda capturas en `.review/lighting-*.png` y una pieza lista para usar en `exports/giraffe-bio-logo-stone-fondo.png`.

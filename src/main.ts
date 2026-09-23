@@ -3,6 +3,7 @@ import './styles/studio.css'
 import { createStudio } from './studio'
 import { type Piece } from './logo'
 import { type Finish } from './materials'
+import { lightControlsMarkup, bindLightControls } from './light-controls'
 
 const downloadIcon = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4" stroke="currentColor" stroke-width="1.5"/></svg>'
 const resetIcon = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 10a8 8 0 1 1 .7 6M4 4v6h6" stroke="currentColor" stroke-width="1.5"/></svg>'
@@ -23,12 +24,13 @@ app.innerHTML = `
       </div>
       <div class="stage-bottom"><span class="drag-hint"><span aria-hidden="true">↔</span> Arrastrá para explorar</span><div class="view-actions"><button id="motion" type="button" aria-pressed="true" disabled>Pausar movimiento</button><button id="reset" class="icon-button" type="button" aria-label="Restablecer vista" title="Restablecer vista" disabled>${resetIcon}</button></div></div>
     </section>
+    ${lightControlsMarkup()}
     <section class="controls" id="controls" aria-label="Personalizar logo">
       <fieldset class="control-block"><legend>01 <span>Pieza</span></legend><div class="segmented" id="piece"><button type="button" data-piece="logo" aria-pressed="true" disabled>Logo completo</button><button type="button" data-piece="symbol" aria-pressed="false" disabled>Isotipo</button></div></fieldset>
       <fieldset class="control-block"><legend>02 <span>Material</span></legend><div class="materials" id="materials"><button type="button" data-finish="stone" aria-pressed="true" disabled><i class="swatch stone"></i>Piedra</button><button type="button" data-finish="graphite" aria-pressed="false" disabled><i class="swatch graphite"></i>Grafito</button><button type="button" data-finish="copper" aria-pressed="false" disabled><i class="swatch copper"></i>Cobre</button><button type="button" data-finish="ivory" aria-pressed="false" disabled><i class="swatch ivory"></i>Marfil</button></div></fieldset>
       <fieldset class="control-block depth-control"><legend>03 <span>Profundidad</span></legend><div class="depth-row"><input id="depth" type="range" min="24" max="130" value="78" aria-label="Profundidad del logo" disabled /><output for="depth" id="depth-value">78</output></div></fieldset>
     </section>
-    <div class="export-bar"><label class="checkbox"><input id="transparent" type="checkbox" checked /><span>PNG con fondo transparente</span></label><div class="export-actions"><button type="button" id="export-model" class="button secondary" disabled>Modelo 3D <span>.glb</span>${downloadIcon}</button><button type="button" id="export-image" class="button primary" disabled>Descargar imagen${downloadIcon}</button></div></div>
+    <div class="export-bar"><label class="checkbox"><input id="transparent" type="checkbox" /><span>PNG con fondo transparente</span></label><div class="export-actions"><button type="button" id="export-model" class="button secondary" disabled>Modelo 3D <span>.glb</span>${downloadIcon}</button><button type="button" id="export-image" class="button primary" disabled>Descargar imagen${downloadIcon}</button></div></div>
     <p id="status" class="status" role="status">Preparando el logo…</p>
   </main>
   <footer><span>Giraffe bio. / Estudio de identidad</span><span>Giraffe bio. © ${new Date().getFullYear()}</span></footer>
@@ -56,6 +58,7 @@ async function start() {
   studio.onMotionChange = updateMotion
   updateMotion(studio.moving)
   status.textContent = ''
+  bindLightControls(settings => studio.setLight(settings))
   motion.addEventListener('click', () => studio.setMotion(!studio.moving))
   document.querySelector('#reset')!.addEventListener('click', () => studio.reset())
   document.querySelectorAll<HTMLButtonElement>('[data-piece]').forEach(button => {

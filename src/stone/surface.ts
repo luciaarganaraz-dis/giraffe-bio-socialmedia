@@ -46,11 +46,13 @@ export async function createStoneSurface(renderer: THREE.WebGLRenderer) {
   const intensities: Record<string, number> = { key: LOOK.keyLight, rim: LOOK.rimLight, fill: LOOK.fillLight }
   for (const [name, light] of Object.entries(LOOK.lights as Record<string, RockLight>)) {
     const lamp = new THREE.DirectionalLight(light.color, light.i ?? intensities[name] ?? 1)
+    lamp.name = name
     lamp.position.set(light.x, light.y, light.z)
     if (name === 'key') {
       lamp.castShadow = true
       lamp.shadow.mapSize.set(2048, 2048)
       Object.assign(lamp.shadow.camera, { left: -8, right: 8, top: 5, bottom: -5, near: .1, far: 30 })
+      lamp.shadow.intensity = .48
       lamp.shadow.bias = -.0001
       lamp.shadow.normalBias = .004
     }
@@ -64,6 +66,7 @@ export async function createStoneSurface(renderer: THREE.WebGLRenderer) {
   return {
     material, uniforms, environment: environment.texture, lights,
     dispose() {
+      lights.traverse(object => { if (object instanceof THREE.Light) object.dispose() })
       material.dispose()
       normal.dispose()
       arm.dispose()

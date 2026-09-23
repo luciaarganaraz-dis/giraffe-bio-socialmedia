@@ -1,5 +1,5 @@
 import {
-  AgXToneMapping, ACESFilmicToneMapping, AmbientLight, Box3, Color, DirectionalLight, Group,
+  AgXToneMapping, ACESFilmicToneMapping, Box3, Color, Group,
   OrthographicCamera, PCFSoftShadowMap, PMREMGenerator, Scene, Vector2, Vector3, WebGLRenderer,
 } from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
@@ -8,6 +8,8 @@ import { createLogo, disposeLogo, readLogo, type Piece } from './logo'
 import { applyFinish, createMaterials, type Finish } from './materials'
 import { createStoneSurface } from './stone/surface'
 import { CARVED_LOOK as LOOK } from './stone/carved-look'
+import { createStoneBackdrop } from './stone/backdrop'
+import { createLighting, type LightSettings } from './lighting'
 
 export async function createStudio(host: HTMLElement) {
   const response = await fetch(`${import.meta.env.BASE_URL}giraffe-bio.svg`)
@@ -30,20 +32,14 @@ export async function createStudio(host: HTMLElement) {
   scene.environment = environmentMap.texture
   environment.dispose()
   pmrem.dispose()
-  const studioLights = new Group()
-  scene.add(studioLights)
-  studioLights.add(new AmbientLight('white', 0.9))
-  const key = new DirectionalLight('white', 3.5)
-  key.position.set(-4, 7, 8)
-  studioLights.add(key)
-  const rim = new DirectionalLight('#f3d9c6', 2.2)
-  rim.position.set(6, 2, -4)
-  studioLights.add(rim)
 
   const materials = createMaterials()
   applyFinish(materials, 'graphite')
   const stone = await createStoneSurface(renderer)
   scene.add(stone.lights)
+  const lighting = createLighting(renderer, scene, stone.lights)
+  const backdrop = createStoneBackdrop(stone.uniforms)
+  scene.add(backdrop.mesh)
   let finish: Finish = 'stone'
   updateLighting()
   let piece: Piece = 'logo'
@@ -83,7 +79,11 @@ export async function createStudio(host: HTMLElement) {
     camera.bottom = -halfHeight
     camera.updateProjectionMatrix()
   }
-  function render() { renderer.render(scene, camera) }
+  function render() {
+    lighting.update(camera)
+    backdrop.update(camera, pivot)
+    renderer.render(scene, camera)
+  }
   function resize() {
     const { width, height } = host.getBoundingClientRect()
     if (!width || !height) return
@@ -143,6 +143,11 @@ export async function createStudio(host: HTMLElement) {
     set onMotionChange(callback: (value: boolean) => void) { onMotionChange = callback },
     setMotion,
     reset,
+    setLight(settings: Partial<LightSettings>) {
+      lighting.set(settings)
+      host.dataset.light = JSON.stringify(lighting.settings)
+      render()
+    },
     key(event: KeyboardEvent) {
       const directions: Record<string, [number, number]> = {
         ArrowLeft: [0, -0.1], ArrowRight: [0, 0.1], ArrowUp: [-0.1, 0], ArrowDown: [0.1, 0],
@@ -177,13 +182,15 @@ export async function createStudio(host: HTMLElement) {
       const originalSize = renderer.getSize(new Vector2())
       const originalRatio = renderer.getPixelRatio()
       const originalBackground = scene.background
+      const originalBackdrop = backdrop.mesh.visible
       try {
         renderer.setPixelRatio(1)
         const width = piece === 'symbol' ? 2048 : 3000
         const height = piece === 'symbol' ? 2048 : 1500
         renderer.setSize(width, height, false)
         fit(width, height)
-        scene.background = transparent ? null : new Color(finish === 'stone' ? '#111316' : '#f1f0eb')
+        backdrop.mesh.visible = !transparent
+        scene.background = transparent ? null : new Color('#111316')
         render()
         return await new Promise<Blob>((resolve, reject) => renderer.domElement.toBlob(blob => {
           if (blob) resolve(blob)
@@ -191,6 +198,7 @@ export async function createStudio(host: HTMLElement) {
         }, 'image/png'))
       } finally {
         scene.background = originalBackground
+        backdrop.mesh.visible = originalBackdrop
         renderer.setPixelRatio(originalRatio)
         renderer.setSize(originalSize.x, originalSize.y, false)
         resize()
@@ -204,6 +212,7 @@ export async function createStudio(host: HTMLElement) {
       controls.dispose()
       disposeLogo(model)
       materials.forEach(material => material.dispose())
+      backdrop.dispose()
       stone.dispose()
       environmentMap.dispose()
       renderer.dispose()
@@ -214,13 +223,10 @@ export async function createStudio(host: HTMLElement) {
   function updateLighting() {
     const rocky = finish === 'stone'
     host.closest('.stage')?.setAttribute('data-surface', finish)
-    studioLights.visible = !rocky
-    stone.lights.visible = rocky
+    lighting.setFinish(rocky)
     scene.environment = rocky ? stone.environment : environmentMap.texture
-    scene.environmentIntensity = rocky ? LOOK.envIntensity : 1
     scene.environmentRotation.y = rocky ? LOOK.envRotation * Math.PI / 180 : 0
     renderer.toneMapping = rocky ? AgXToneMapping : ACESFilmicToneMapping
-    renderer.toneMappingExposure = rocky ? LOOK.exposure : 1.35
   }
 
   function measureModel() {

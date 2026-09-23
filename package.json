@@ -9,7 +9,8 @@
     "preview": "vite preview --host 127.0.0.1 --port 4187 --strictPort",
     "check": "tsc --noEmit",
     "shots": "node scripts/review.mjs",
-    "check:stone": "node scripts/check-stone.mjs"
+    "check:stone": "node scripts/check-stone.mjs",
+    "check:lighting": "node scripts/check-lighting.mjs"
   },
   "dependencies": {
     "three": "0.185.1",
