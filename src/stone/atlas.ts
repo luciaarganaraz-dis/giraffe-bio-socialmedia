@@ -1,3 +1,4 @@
+import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js'
 import { Float32BufferAttribute, Group, Mesh, type BufferGeometry } from 'three'
 
 /** Three non-overlapping charts per piece: back, front and the perimeter strip. */
@@ -29,7 +30,8 @@ export function atlasModel(source: Group, resolution: number) {
     }
     geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2))
     geometry.clearGroups()
-    mesh.geometry = geometry
+    mesh.geometry = mergeVertices(geometry, .00001)
+    geometry.dispose()
   })
   return clone
 }

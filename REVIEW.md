@@ -1,24 +1,17 @@
-# Revisión del estudio 3D
+# Revisión de la piedra esculpida
 
 Verificado el 23 de septiembre de 2026.
 
-- Escritorio 1440 px, tablet 768 px y móvil 390 px: capturas revisadas, sin desborde horizontal.
-- Movimiento reducido: composición estática; no se siguen pintando fotogramas al quedar quieta.
+- Referencia vigente: letra A de roca gris erosionada. Se reemplazó la dirección de mineral oscuro con pirita por relieve físico y piedra gris mate.
+- Logo e isotipo revisados en el navegador local. No se amplió esta pasada a otras resoluciones de interfaz por pedido de la diseñadora.
 - 17 mallas en el logo completo y 5 en el isotipo, generadas del SVG original.
-- Redimensionado 1440 → 768 → 390 → 1440: un solo lienzo y sin desbordes.
-- Giro manual, zoom, controles por teclado, cambio de pieza y material comprobados.
-- PNG transparente a 3000 × 1500 y PNG con fondo opaco descargados.
-- GLB del logo y del isotipo descargados; estructura glTF 2.0 válida y volumen en Z.
-- Sin errores de consola en las cuatro composiciones.
-- TypeScript y compilación de producción correctos.
+- Caras subdivididas y desplazadas: variación frontal mayor a 0.12 unidades de escena, comprobada antes de exportar. La erosión afecta también el contorno y las paredes interiores.
+- Exportación PNG transparente 3000 × 1500 y GLB con 3 mapas PBR incorporados verificada.
+- GLB abierto con GLTFLoader y vuelto a renderizar con material neutro sin texturas: el relieve sigue presente. El grano fino del horneado es más suave que el shader vivo.
+- Cambio entre piedra, grafito, cobre y marfil; logo/isotipo y profundidad comprobados. Los acabados lisos recuperan su geometría sin erosión.
+- Movimiento reducido mantiene la composición estática. Giro y pausa disponibles en el estudio.
+- Sin errores de consola. TypeScript y compilación de producción correctos.
 
-Las capturas y el informe con las medidas se regeneran con `pnpm shots` en `.review/`.
-El modelo GLB incluye geometría y materiales; la iluminación y la cámara pertenecen al estudio del navegador.
+`pnpm check:stone` regenera capturas en `.review/stone-*.png` y actualiza los archivos de piedra en `exports/`. `stone-geometry.png` muestra únicamente la geometría con un material neutro.
 
-## Acabado piedra
-
-- Material, relieve, HDR y seis luces reutilizados del repositorio Giraffe bio.
-- Revisados logo e isotipo en el estudio, sin ampliar esta pasada a otras resoluciones de interfaz por pedido de la diseñadora.
-- Exportación PNG transparente y GLB con 3 mapas PBR incorporados verificada.
-- GLB vuelto a abrir con GLTFLoader: geometría y texturas presentes; el horneado suaviza el grano fino del material procedural.
-- Cambios entre piedra, grafito, cobre y marfil, y ajuste de profundidad comprobados sin errores.
+El GLB incluye la geometría y sus materiales; la iluminación, la cámara y el fondo pertenecen al estudio. La pieza de piedra pesa aproximadamente 35 MB por el relieve subdividido y los mapas incorporados.

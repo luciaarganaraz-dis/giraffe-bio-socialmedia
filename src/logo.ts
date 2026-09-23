@@ -1,6 +1,7 @@
 import { Box3, ExtrudeGeometry, Group, Mesh, Path, Shape, Vector2, Vector3, type Material } from 'three'
 import { mergeVertices, toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js'
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js'
+import { sculptStone } from './stone/sculpt'
 import { logoUVs } from './stone/unwrap'
 import polygonClipping, { type Polygon, type Ring } from 'polygon-clipping'
 
@@ -22,37 +23,42 @@ export function readLogo(svg: string) {
   })
 }
 
-export function createLogo(shapes: ReturnType<typeof readLogo>, piece: Piece, depth: number, material: Material[]) {
+export function createLogo(shapes: ReturnType<typeof readLogo>, piece: Piece, depth: number, material: Material[], carved = false) {
   const group = new Group()
   group.name = piece === 'logo' ? 'Giraffe bio. — logo' : 'Giraffe bio. — symbol'
   for (const [i, entry] of shapes.entries()) {
     if (piece === 'symbol' && !entry.isSymbol) continue
-    const geometry = new ExtrudeGeometry(entry.shape, {
-      depth, steps: 1, UVGenerator: logoUVs(), bevelEnabled: true, bevelThickness: 1.2,
-      bevelSize: 0.8, bevelSegments: 4, curveSegments: 20,
-    })
-    // Smooth in SVG units: the normal helper quantizes positions to 0.01.
-    // Scaling first would merge distinct bevel rings and create streaks.
-    toCreasedNormals(geometry, Math.PI / 3)
-    const positions = geometry.getAttribute('position')
-    const normals = geometry.getAttribute('normal')
-    for (let vertex = 0; vertex < positions.count; vertex++) {
-      const z = positions.getZ(vertex)
-      if (Math.abs(z + 1.2) < 0.001) normals.setXYZ(vertex, 0, 0, -1)
-      if (Math.abs(z - depth - 1.2) < 0.001) normals.setXYZ(vertex, 0, 0, 1)
+    let compact
+    if (carved) compact = sculptStone(entry.shape, depth, 307 + i * 113)
+    else {
+      const geometry = new ExtrudeGeometry(entry.shape, {
+        depth, steps: 1, UVGenerator: logoUVs(), bevelEnabled: true, bevelThickness: 1.2,
+        bevelSize: 0.8, bevelSegments: 4, curveSegments: 20,
+      })
+      // Smooth in SVG units: the normal helper quantizes positions to 0.01.
+      // Scaling first would merge distinct bevel rings and create streaks.
+      toCreasedNormals(geometry, Math.PI / 3)
+      const positions = geometry.getAttribute('position')
+      const normals = geometry.getAttribute('normal')
+      for (let vertex = 0; vertex < positions.count; vertex++) {
+        const z = positions.getZ(vertex)
+        if (Math.abs(z + 1.2) < 0.001) normals.setXYZ(vertex, 0, 0, -1)
+        if (Math.abs(z - depth - 1.2) < 0.001) normals.setXYZ(vertex, 0, 0, 1)
+      }
+      geometry.scale(0.01, 0.01, 0.01)
+      compact = mergeVertices(geometry, 0.0001)
+      geometry.dispose()
     }
-    geometry.scale(0.01, 0.01, 0.01)
-    const compact = mergeVertices(geometry, 0.0001)
-    geometry.dispose()
     const mesh = new Mesh(compact, material)
     mesh.name = `${entry.isSymbol ? 'Symbol' : 'Letter'} ${i + 1}`
     mesh.castShadow = true
+    mesh.receiveShadow = true
     group.add(mesh)
   }
   const bounds = new Box3().setFromObject(group)
   const center = bounds.getCenter(new Vector3())
   for (const child of group.children) child.position.sub(center)
-  group.userData = { source: 'giraffe-bio.svg', depth, piece }
+  group.userData = { source: 'giraffe-bio.svg', depth, piece, carved }
   return group
 }
 

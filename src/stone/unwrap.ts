@@ -1,11 +1,11 @@
 import { Vector2, type ExtrudeGeometryOptions } from 'three'
 
 /** A separate continuous strip for the extrusion, including the inner counters. */
-export function logoUVs(): NonNullable<ExtrudeGeometryOptions['UVGenerator']> {
+export function logoUVs(layers = 9): NonNullable<ExtrudeGeometryOptions['UVGenerator']> {
   let call = 0
   let cursor = 0
   let edge = 0
-  const layers = 9 // One depth step and four bevel segments on each face.
+  // The caller supplies the depth steps plus both bevel stacks.
   return {
     generateTopUV(_geometry, vertices, a, b, c) {
       return [a, b, c].map(i => new Vector2(vertices[i * 3], vertices[i * 3 + 1]))

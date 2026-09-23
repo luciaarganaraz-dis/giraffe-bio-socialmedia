@@ -7,7 +7,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { createLogo, disposeLogo, readLogo, type Piece } from './logo'
 import { applyFinish, createMaterials, type Finish } from './materials'
 import { createStoneSurface } from './stone/surface'
-import { LOOK } from './stone/look'
+import { CARVED_LOOK as LOOK } from './stone/carved-look'
 
 export async function createStudio(host: HTMLElement) {
   const response = await fetch(`${import.meta.env.BASE_URL}giraffe-bio.svg`)
@@ -17,6 +17,7 @@ export async function createStudio(host: HTMLElement) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   renderer.toneMapping = ACESFilmicToneMapping
   renderer.toneMappingExposure = 1.35
+  renderer.shadowMap.enabled = true
   renderer.shadowMap.type = PCFSoftShadowMap
   host.append(renderer.domElement)
   renderer.domElement.setAttribute('aria-hidden', 'true')
@@ -46,8 +47,8 @@ export async function createStudio(host: HTMLElement) {
   let finish: Finish = 'stone'
   updateLighting()
   let piece: Piece = 'logo'
-  let depth = 36
-  let model = createLogo(shapes, piece, depth, finish === 'stone' ? [stone.material, stone.material] : materials)
+  let depth = 78
+  let model = createLogo(shapes, piece, depth, finish === 'stone' ? [stone.material, stone.material] : materials, finish === 'stone')
   const pivot = new Group()
   pivot.add(model)
   scene.add(pivot)
@@ -132,7 +133,7 @@ export async function createStudio(host: HTMLElement) {
   reset()
   frame = requestAnimationFrame(animate)
   host.dataset.ready = 'true'
-  host.dataset.meshes = String(model.children.length)
+  measureModel()
 
   return {
     get moving() { return moving },
@@ -182,7 +183,7 @@ export async function createStudio(host: HTMLElement) {
         const height = piece === 'symbol' ? 2048 : 1500
         renderer.setSize(width, height, false)
         fit(width, height)
-        scene.background = transparent ? null : new Color('#f1f0eb')
+        scene.background = transparent ? null : new Color(finish === 'stone' ? '#111316' : '#f1f0eb')
         render()
         return await new Promise<Blob>((resolve, reject) => renderer.domElement.toBlob(blob => {
           if (blob) resolve(blob)
@@ -212,6 +213,7 @@ export async function createStudio(host: HTMLElement) {
 
   function updateLighting() {
     const rocky = finish === 'stone'
+    host.closest('.stage')?.setAttribute('data-surface', finish)
     studioLights.visible = !rocky
     stone.lights.visible = rocky
     scene.environment = rocky ? stone.environment : environmentMap.texture
@@ -221,12 +223,19 @@ export async function createStudio(host: HTMLElement) {
     renderer.toneMappingExposure = rocky ? LOOK.exposure : 1.35
   }
 
+  function measureModel() {
+    host.dataset.meshes = String(model.children.length)
+    host.dataset.carved = String(model.userData.carved)
+    host.dataset.relief = String(Math.max(...model.children.map(child =>
+      'geometry' in child ? (child as import('three').Mesh).geometry.userData.frontRelief ?? 0 : 0)))
+  }
+
   function rebuild() {
     pivot.remove(model)
     disposeLogo(model)
-    model = createLogo(shapes, piece, depth, finish === 'stone' ? [stone.material, stone.material] : materials)
+    model = createLogo(shapes, piece, depth, finish === 'stone' ? [stone.material, stone.material] : materials, finish === 'stone')
     pivot.add(model)
-    host.dataset.meshes = String(model.children.length)
+    measureModel()
     resize()
   }
 }

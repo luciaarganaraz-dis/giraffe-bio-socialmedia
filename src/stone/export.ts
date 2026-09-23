@@ -14,7 +14,7 @@ export async function exportLogo(source: Group, stone?: StoneSource) {
   try {
     maps = bakeStone(stone.renderer, model, stone.uniforms, 2048)
     material = new MeshStandardMaterial({
-      name: 'Giraffe Bio — piedra con pirita (PBR)', color: 'white',
+      name: 'Giraffe Bio — piedra gris esculpida (PBR)', color: 'white',
       map: maps[0], roughnessMap: maps[1], metalnessMap: maps[1], normalMap: maps[2],
       roughness: 1, metalness: 1,
     })

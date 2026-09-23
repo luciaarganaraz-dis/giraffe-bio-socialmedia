@@ -110,3 +110,8 @@ footer { margin: 12px var(--space) 0; border-top: 1px solid var(--rule); display
   footer { flex-direction: column; gap: 12px; line-height: 1.5; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+
+.stage[data-surface='stone'] { background: radial-gradient(ellipse at 35% 25%, #272a2e, var(--stone-stage) 78%); border-color: var(--stone-stage); }
+.stage[data-surface='stone'] .stage-top, .stage[data-surface='stone'] .stage-top > :last-child,
+.stage[data-surface='stone'] .stage-bottom { color: var(--stone-label); }
+.stage[data-surface='stone']::before, .stage[data-surface='stone']::after { color: var(--stone-label); }

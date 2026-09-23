@@ -1,10 +1,11 @@
 import * as THREE from 'three'
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js'
-import { LOOK, type RockLight } from './look'
+import { type RockLight } from './look'
+import { CARVED_LOOK as LOOK } from './carved-look'
 import { makeNoise3DTexture } from './noise3d'
 import { applyLook, applyTriplanar, createTriUniforms } from './triplanar'
 
-/** The approved hero material and its lighting, copied from the Giraffe Bio site. */
+/** Scanned detail from the site, adapted to the sculpted gray stone and raking light. */
 export async function createStoneSurface(renderer: THREE.WebGLRenderer) {
   const base = `${import.meta.env.BASE_URL}rock/`
   const loader = new THREE.TextureLoader().setPath(base)
@@ -32,11 +33,11 @@ export async function createStoneSurface(renderer: THREE.WebGLRenderer) {
   uniforms.uTriArm.value = arm
   applyLook(LOOK, uniforms)
   const material = new THREE.MeshStandardMaterial({
-    name: 'Giraffe Bio — piedra oscura con pirita',
+    name: 'Giraffe Bio — piedra gris erosionada',
     color: 'white', roughness: LOOK.roughness, metalness: LOOK.metalness,
   })
   applyTriplanar(material, uniforms)
-  material.customProgramCacheKey = () => 'giraffe-bio-stone-v1'
+  material.customProgramCacheKey = () => 'giraffe-bio-carved-stone-v2'
   const pmrem = new THREE.PMREMGenerator(renderer)
   const environment = pmrem.fromEquirectangular(hdr)
   hdr.dispose()
@@ -46,6 +47,13 @@ export async function createStoneSurface(renderer: THREE.WebGLRenderer) {
   for (const [name, light] of Object.entries(LOOK.lights as Record<string, RockLight>)) {
     const lamp = new THREE.DirectionalLight(light.color, light.i ?? intensities[name] ?? 1)
     lamp.position.set(light.x, light.y, light.z)
+    if (name === 'key') {
+      lamp.castShadow = true
+      lamp.shadow.mapSize.set(2048, 2048)
+      Object.assign(lamp.shadow.camera, { left: -8, right: 8, top: 5, bottom: -5, near: .1, far: 30 })
+      lamp.shadow.bias = -.0001
+      lamp.shadow.normalBias = .004
+    }
     lights.add(lamp)
   }
   for (const light of LOOK.extraLights) {

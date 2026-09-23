@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { LOOK } from './look'
+import { CARVED_LOOK as LOOK } from './carved-look'
 import { FRAG_COMMON, FRAG_MAP, FRAG_METAL, FRAG_NORMAL, FRAG_ROUGH } from './triplanar-shaders'
 import type { TriUniforms } from './triplanar'
 
