@@ -5,13 +5,13 @@ export const finishes = {
   copper: { label: 'Cobre', color: '#bd7757', side: '#905136', metalness: 0.86, roughness: 0.24 },
   ivory: { label: 'Marfil', color: '#e1dfd3', side: '#c8c4b4', metalness: 0.16, roughness: 0.26 },
 } as const
-export type Finish = keyof typeof finishes
+export type Finish = keyof typeof finishes | 'stone'
 
 export function createMaterials() {
   return [new MeshPhysicalMaterial(), new MeshPhysicalMaterial()]
 }
 
-export function applyFinish(materials: MeshPhysicalMaterial[], name: Finish) {
+export function applyFinish(materials: MeshPhysicalMaterial[], name: Exclude<Finish, 'stone'>) {
   const finish = finishes[name]
   materials.forEach((material, index) => {
     material.color.set(index === 0 ? finish.color : finish.side)

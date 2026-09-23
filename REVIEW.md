@@ -14,3 +14,11 @@ Verificado el 23 de septiembre de 2026.
 
 Las capturas y el informe con las medidas se regeneran con `pnpm shots` en `.review/`.
 El modelo GLB incluye geometría y materiales; la iluminación y la cámara pertenecen al estudio del navegador.
+
+## Acabado piedra
+
+- Material, relieve, HDR y seis luces reutilizados del repositorio Giraffe bio.
+- Revisados logo e isotipo en el estudio, sin ampliar esta pasada a otras resoluciones de interfaz por pedido de la diseñadora.
+- Exportación PNG transparente y GLB con 3 mapas PBR incorporados verificada.
+- GLB vuelto a abrir con GLTFLoader: geometría y texturas presentes; el horneado suaviza el grano fino del material procedural.
+- Cambios entre piedra, grafito, cobre y marfil, y ajuste de profundidad comprobados sin errores.

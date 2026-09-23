@@ -1,11 +1,13 @@
 import {
-  ACESFilmicToneMapping, AmbientLight, Box3, Color, DirectionalLight, Group,
+  AgXToneMapping, ACESFilmicToneMapping, AmbientLight, Box3, Color, DirectionalLight, Group,
   OrthographicCamera, PCFSoftShadowMap, PMREMGenerator, Scene, Vector2, Vector3, WebGLRenderer,
 } from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { createLogo, disposeLogo, readLogo, type Piece } from './logo'
 import { applyFinish, createMaterials, type Finish } from './materials'
+import { createStoneSurface } from './stone/surface'
+import { LOOK } from './stone/look'
 
 export async function createStudio(host: HTMLElement) {
   const response = await fetch(`${import.meta.env.BASE_URL}giraffe-bio.svg`)
@@ -27,20 +29,25 @@ export async function createStudio(host: HTMLElement) {
   scene.environment = environmentMap.texture
   environment.dispose()
   pmrem.dispose()
-  scene.add(new AmbientLight('white', 0.9))
+  const studioLights = new Group()
+  scene.add(studioLights)
+  studioLights.add(new AmbientLight('white', 0.9))
   const key = new DirectionalLight('white', 3.5)
   key.position.set(-4, 7, 8)
-  scene.add(key)
+  studioLights.add(key)
   const rim = new DirectionalLight('#f3d9c6', 2.2)
   rim.position.set(6, 2, -4)
-  scene.add(rim)
+  studioLights.add(rim)
 
   const materials = createMaterials()
-  let finish: Finish = 'graphite'
-  applyFinish(materials, finish)
+  applyFinish(materials, 'graphite')
+  const stone = await createStoneSurface(renderer)
+  scene.add(stone.lights)
+  let finish: Finish = 'stone'
+  updateLighting()
   let piece: Piece = 'logo'
   let depth = 36
-  let model = createLogo(shapes, piece, depth, materials)
+  let model = createLogo(shapes, piece, depth, finish === 'stone' ? [stone.material, stone.material] : materials)
   const pivot = new Group()
   pivot.add(model)
   scene.add(pivot)
@@ -155,7 +162,16 @@ export async function createStudio(host: HTMLElement) {
     },
     setPiece(value: Piece) { piece = value; rebuild(); reset() },
     setDepth(value: number) { depth = value; rebuild() },
-    setFinish(value: Finish) { finish = value; applyFinish(materials, value); render() },
+    setFinish(value: Finish) {
+      finish = value
+      if (value !== 'stone') applyFinish(materials, value)
+      updateLighting()
+      rebuild()
+    },
+    async exportModel() {
+      const { exportLogo } = await import('./stone/export')
+      return exportLogo(model, finish === 'stone' ? { renderer, uniforms: stone.uniforms } : undefined)
+    },
     async capture(transparent: boolean) {
       const originalSize = renderer.getSize(new Vector2())
       const originalRatio = renderer.getPixelRatio()
@@ -187,16 +203,28 @@ export async function createStudio(host: HTMLElement) {
       controls.dispose()
       disposeLogo(model)
       materials.forEach(material => material.dispose())
+      stone.dispose()
       environmentMap.dispose()
       renderer.dispose()
       renderer.domElement.remove()
     },
   }
 
+  function updateLighting() {
+    const rocky = finish === 'stone'
+    studioLights.visible = !rocky
+    stone.lights.visible = rocky
+    scene.environment = rocky ? stone.environment : environmentMap.texture
+    scene.environmentIntensity = rocky ? LOOK.envIntensity : 1
+    scene.environmentRotation.y = rocky ? LOOK.envRotation * Math.PI / 180 : 0
+    renderer.toneMapping = rocky ? AgXToneMapping : ACESFilmicToneMapping
+    renderer.toneMappingExposure = rocky ? LOOK.exposure : 1.35
+  }
+
   function rebuild() {
     pivot.remove(model)
     disposeLogo(model)
-    model = createLogo(shapes, piece, depth, materials)
+    model = createLogo(shapes, piece, depth, finish === 'stone' ? [stone.material, stone.material] : materials)
     pivot.add(model)
     host.dataset.meshes = String(model.children.length)
     resize()

@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4187 --strictPort",
     "check": "tsc --noEmit",
-    "shots": "node scripts/review.mjs"
+    "shots": "node scripts/review.mjs",
+    "check:stone": "node scripts/check-stone.mjs"
   },
   "dependencies": {
     "three": "0.185.1",

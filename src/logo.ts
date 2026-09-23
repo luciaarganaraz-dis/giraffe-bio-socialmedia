@@ -1,6 +1,7 @@
 import { Box3, ExtrudeGeometry, Group, Mesh, Path, Shape, Vector2, Vector3, type Material } from 'three'
 import { mergeVertices, toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js'
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js'
+import { logoUVs } from './stone/unwrap'
 import polygonClipping, { type Polygon, type Ring } from 'polygon-clipping'
 
 export type Piece = 'logo' | 'symbol'
@@ -27,7 +28,7 @@ export function createLogo(shapes: ReturnType<typeof readLogo>, piece: Piece, de
   for (const [i, entry] of shapes.entries()) {
     if (piece === 'symbol' && !entry.isSymbol) continue
     const geometry = new ExtrudeGeometry(entry.shape, {
-      depth, steps: 1, bevelEnabled: true, bevelThickness: 1.2,
+      depth, steps: 1, UVGenerator: logoUVs(), bevelEnabled: true, bevelThickness: 1.2,
       bevelSize: 0.8, bevelSegments: 4, curveSegments: 20,
     })
     // Smooth in SVG units: the normal helper quantizes positions to 0.01.

@@ -25,7 +25,7 @@ app.innerHTML = `
     </section>
     <section class="controls" id="controls" aria-label="Personalizar logo">
       <fieldset class="control-block"><legend>01 <span>Pieza</span></legend><div class="segmented" id="piece"><button type="button" data-piece="logo" aria-pressed="true" disabled>Logo completo</button><button type="button" data-piece="symbol" aria-pressed="false" disabled>Isotipo</button></div></fieldset>
-      <fieldset class="control-block"><legend>02 <span>Material</span></legend><div class="materials" id="materials"><button type="button" data-finish="graphite" aria-pressed="true" disabled><i class="swatch graphite"></i>Grafito</button><button type="button" data-finish="copper" aria-pressed="false" disabled><i class="swatch copper"></i>Cobre</button><button type="button" data-finish="ivory" aria-pressed="false" disabled><i class="swatch ivory"></i>Marfil</button></div></fieldset>
+      <fieldset class="control-block"><legend>02 <span>Material</span></legend><div class="materials" id="materials"><button type="button" data-finish="stone" aria-pressed="true" disabled><i class="swatch stone"></i>Piedra</button><button type="button" data-finish="graphite" aria-pressed="false" disabled><i class="swatch graphite"></i>Grafito</button><button type="button" data-finish="copper" aria-pressed="false" disabled><i class="swatch copper"></i>Cobre</button><button type="button" data-finish="ivory" aria-pressed="false" disabled><i class="swatch ivory"></i>Marfil</button></div></fieldset>
       <fieldset class="control-block depth-control"><legend>03 <span>Profundidad</span></legend><div class="depth-row"><input id="depth" type="range" min="8" max="60" value="36" aria-label="Profundidad del logo" disabled /><output for="depth" id="depth-value">36</output></div></fieldset>
     </section>
     <div class="export-bar"><label class="checkbox"><input id="transparent" type="checkbox" checked /><span>PNG con fondo transparente</span></label><div class="export-actions"><button type="button" id="export-model" class="button secondary" disabled>Modelo 3D <span>.glb</span>${downloadIcon}</button><button type="button" id="export-image" class="button primary" disabled>Descargar imagen${downloadIcon}</button></div></div>
@@ -89,8 +89,7 @@ async function start() {
       try {
         const name = `giraffe-bio-${studio.piece}-${studio.finish}`
         if (format === 'model') {
-          const { GLTFExporter } = await import('three/addons/exporters/GLTFExporter.js')
-          const buffer = await new GLTFExporter().parseAsync(studio.model, { binary: true }) as ArrayBuffer
+          const buffer = await studio.exportModel()
           save(new Blob([buffer], { type: 'model/gltf-binary' }), `${name}.glb`)
         } else {
           const transparent = document.querySelector<HTMLInputElement>('#transparent')!.checked
