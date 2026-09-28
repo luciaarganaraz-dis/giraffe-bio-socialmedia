@@ -189,7 +189,7 @@ export async function createStudio(host: HTMLElement) {
     async exportModel() {
       if (piece === 'sculpture') {
         const { exportSculpture } = await import('./sculpture/export')
-        return exportSculpture(model, renderer, sculptureSurface.uniforms, stone.uniforms)
+        return exportSculpture(model, renderer, sculptureSurface.uniforms)
       }
       const { exportLogo } = await import('./stone/export')
       return exportLogo(model, finish === 'stone' ? { renderer, uniforms: stone.uniforms } : undefined)
@@ -260,7 +260,7 @@ export async function createStudio(host: HTMLElement) {
   function makeModel() {
     const selected = finish === 'stone' ? [stone.material, stone.material] : materials
     return piece === 'sculpture'
-      ? createSculpture(shapes, depth, selected, sculptureSurface.material, sculptureSurface.ivory, finish === 'stone')
+      ? createSculpture(shapes, depth, sculptureSurface.material)
       : createLogo(shapes, piece, depth, selected, finish === 'stone')
   }
 

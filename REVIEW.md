@@ -27,10 +27,11 @@ El GLB incluye la geometría y sus materiales; la iluminación, la cámara y el 
 
 ## Escultura mineral — 28 de septiembre de 2026
 
-- Monolito de roca oscura con el símbolo original en grafito al frente y en marfil sobre el lateral, revisado en el navegador. Panel de luz junto al visor.
-- 11 mallas: una roca cerrada y cinco piezas para cada aplicación del isotipo.
+- Una piedra con un solo isologo original, revisada en el navegador. Tres partes hundidas y dos salientes; un mismo material de roca en toda la figura. Se eliminó la segunda aplicación lateral.
+- Una malla obtenida por sustracción y unión de volúmenes. En profundidad 78, los fondos están entre 0.42 y 0.61 unidades por debajo de la roca original y los relieves entre 0.44 y 0.52 por encima, medidos con rayos sobre las cinco partes.
+- Profundidades 24, 78 y 130 comprobadas: los vaciados y los relieves aumentan en el sentido esperado. Los controles de luz siguen activos.
 - PNG 2160 × 2700 comprobado, con fondo gris y variante transparente (alfa 0 en las esquinas).
-- GLB reabierto y revisado: material de roca con tres mapas PBR incorporados y materiales independientes para los símbolos. La variante con símbolo de piedra incorpora seis mapas.
-- Luz, profundidad, cambio de material y regreso a Logo completo e Isotipo conservan los controles. Movimiento reducido revisado como composición estática.
-- `pnpm check:sculpture`, `pnpm check:lighting` y compilación de producción correctos; sin errores de consola en las comprobaciones.
-- El GLB conserva geometría y materiales; el grano fino del horneado es más suave que el render directo. No incluye el fondo ni la iluminación.
+- GLB reabierto y revisado: una malla, un material y tres mapas PBR. Las mediciones de cavidades y relieves coinciden con la vista local. Aproximadamente 11 MB.
+- El selector de materiales aparece en Logo completo e Isotipo; Escultura conserva un material continuo. Ambos modos anteriores mantienen sus 17 y 5 mallas.
+- Movimiento reducido revisado como composición estática. `pnpm check:sculpture`, TypeScript y compilación de producción correctos; sin errores de consola en las comprobaciones.
+- El GLB conserva geometría y material; el detalle fino del horneado es más suave, especialmente en las paredes estrechas. No incluye el fondo ni la iluminación.

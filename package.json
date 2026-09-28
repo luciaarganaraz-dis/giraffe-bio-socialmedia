@@ -14,14 +14,15 @@
     "check:sculpture": "node scripts/check-sculpture.mjs"
   },
   "dependencies": {
+    "polygon-clipping": "0.15.7",
     "three": "0.185.1",
-    "polygon-clipping": "0.15.7"
+    "three-bvh-csg": "^0.0.18"
   },
   "devDependencies": {
     "@types/three": "0.185.4",
+    "playwright-core": "^1.62.1",
     "typescript": "~5.9.3",
-    "vite": "^7.3.0",
-    "playwright-core": "^1.62.1"
+    "vite": "^7.3.0"
   },
   "engines": {
     "node": ">=22.13"

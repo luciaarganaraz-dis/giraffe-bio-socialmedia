@@ -16,8 +16,8 @@ Abrir **http://127.0.0.1:5187**. El servidor usa un puerto fijo y sólo escucha 
 ## Usar
 
 - Arrastrar el logo para girarlo; rueda o gesto de dos dedos para acercar.
-- Alternar entre Escultura (vista inicial), el logo completo y las cinco piezas del isotipo. La escultura integra dos aplicaciones del símbolo en un monolito de roca oscura.
-- Elegir piedra, grafito, cobre o marfil y ajustar la profundidad. En Escultura se modifica el símbolo frontal; la roca oscura y el símbolo lateral en marfil mantienen su material. Grafito es el acabado inicial.
+- Alternar entre Escultura (vista inicial), el logo completo y las cinco piezas del isotipo. La escultura integra un solo símbolo, con partes hundidas y salientes en la misma roca oscura.
+- Ajustar la profundidad para acentuar el vaciado y el relieve. En Logo completo e Isotipo también se puede elegir piedra, grafito, cobre o marfil; la escultura mantiene un único material de roca.
 - Pausar el movimiento y restablecer la vista.
 - Trabajar la luz en el panel debajo del visor: arrastrar el punto para mover la fuente principal; ajustar intensidad, relleno, contraluz y exposición. Las flechas del teclado también mueven el punto.
 - «Restablecer luz» recupera los valores iniciales sin cambiar el encuadre. Los ajustes se conservan al cambiar de material o pieza.
@@ -36,7 +36,7 @@ El movimiento automático se desactiva al manipular la pieza. Se respeta la pref
 - `src/lighting.ts` y `src/light-controls.ts`: luces del estudio y panel de edición.
 - `src/stone/backdrop.ts`: pared de piedra con relieve, material y sombras.
 - `src/styles/`: composición y colores del estudio.
-- `src/sculpture/`: monolito de geometría irregular, símbolos integrados, fondo gris y exportación con materiales PBR.
+- `src/sculpture/`: monolito de geometría irregular, isologo tallado, fondo gris y exportación con materiales PBR.
 - `src/stone/sculpt.ts`: subdivisión y erosión real de caras, bordes y paredes.
 - `src/stone/carved-look.ts`: gris mineral, poros y luces del acabado actual.
 - `src/stone/`: shader base del sitio y conversión a texturas PBR para GLB.
@@ -79,8 +79,8 @@ El PNG incluye fondo e iluminación. Activar «PNG con fondo transparente» elim
 
 ## Escultura mineral
 
-La composición se inspira en la referencia de Neurath X compartida el 28/09: monolito oscuro, formas geométricas integradas y contraste entre grafito y marfil. La roca es un volumen cerrado, construido a partir de una envolvente irregular subdividida y desplazada. Las dos aplicaciones del símbolo parten del SVG original y penetran la masa de roca para quedar integradas.
+La composición se inspira en la referencia de Neurath X compartida el 28/09. La corrección de la diseñadora define **un solo isologo y el mismo material de piedra en toda la figura**. Las tres partes superiores/izquierdas se sustraen del bloque y las dos inferiores/derechas se unen en relieve. La pieza resultante es una sola malla; los huecos incluyen fondo y paredes interiores reales. El control de profundidad modifica ambos sentidos.
 
-La cámara inicia en tres cuartos. El giro y la flotación son suaves; movimiento reducido mantiene una vista estática. Las luces se editan desde el panel lateral. El PNG de la escultura usa una composición vertical 4:5. El GLB incorpora el monolito y los dos símbolos, con mapas PBR horneados a 2048 px para la roca; la iluminación y el fondo pertenecen al estudio.
+La cámara inicia en tres cuartos. El giro y la flotación son suaves; movimiento reducido mantiene una vista estática. Las luces se editan desde el panel lateral. El PNG de la escultura usa una composición vertical 4:5. El GLB incorpora un solo material con tres mapas PBR horneados a 2048 px; la iluminación y el fondo pertenecen al estudio.
 
-`pnpm check:sculpture` verifica la composición, controles, PNG vertical y transparente, GLB con materiales mixtos, variante con símbolo de piedra y regreso a logo/isotipo. Vuelve a abrir el GLB para revisión visual. Las capturas quedan en `.review/sculpture-*.png`; los entregables están en `exports/giraffe-bio-escultura.png` y `.glb`.
+`pnpm check:sculpture` verifica la composición, controles, PNG vertical y transparente, GLB con un único material y regreso a logo/isotipo. Mide con rayos los fondos hundidos y las caras salientes respecto de la roca original en tres profundidades; repite la medición después de reabrir el GLB. Las capturas quedan en `.review/sculpture-*.png`; los entregables están en `exports/giraffe-bio-escultura.png` y `.glb`.

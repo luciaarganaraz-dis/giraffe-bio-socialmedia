@@ -22,6 +22,19 @@ lighting.setFinish(true)
 lighting.setSculpture(true)
 const { scene: model } = await new GLTFLoader().loadAsync('/exports/giraffe-bio-escultura.glb')
 model.traverse(object => { if (object instanceof THREE.Mesh) { object.castShadow = true; object.receiveShadow = true } })
+model.updateMatrixWorld(true)
+model.traverse(object => {
+  if (!object.userData.relief) return
+  const { probes, center } = object.userData.relief
+  const offset = new THREE.Vector3().fromArray(center)
+  const ray = new THREE.Raycaster()
+  const result = probes.map((probe: { x: number; y: number; recessed: boolean }) => {
+    ray.set(new THREE.Vector3(probe.x, probe.y, 5).sub(offset), new THREE.Vector3(0, 0, -1))
+    const hit = ray.intersectObject(model)[0]
+    return { ...probe, z: hit?.point.z + offset.z }
+  })
+  document.body.dataset.relief = JSON.stringify(result)
+})
 const pivot = new THREE.Group()
 pivot.add(model)
 pivot.rotation.set(.035, -.62, .11)

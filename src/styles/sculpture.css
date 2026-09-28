@@ -15,3 +15,6 @@
   .scene-workspace[data-composition='sculpture'] .light-panel { border-left: 1px solid var(--rule); border-top: 0; }
   .scene-workspace[data-composition='sculpture'] .light-sliders { grid-template-columns: 1fr 1fr; }
 }
+
+#materials[hidden], #sculpture-material[hidden] { display: none; }
+#sculpture-material { margin: 0; font-size: 14px; }

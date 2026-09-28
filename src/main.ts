@@ -30,7 +30,7 @@ app.innerHTML = `
     </div>
     <section class="controls" id="controls" aria-label="Personalizar logo">
       <fieldset class="control-block"><legend>01 <span>Pieza</span></legend><div class="segmented" id="piece"><button type="button" data-piece="sculpture" aria-pressed="true" disabled>Escultura</button><button type="button" data-piece="logo" aria-pressed="false" disabled>Logo completo</button><button type="button" data-piece="symbol" aria-pressed="false" disabled>Isotipo</button></div></fieldset>
-      <fieldset class="control-block"><legend>02 <span>Material</span></legend><div class="materials" id="materials"><button type="button" data-finish="stone" aria-pressed="false" disabled><i class="swatch stone"></i>Piedra</button><button type="button" data-finish="graphite" aria-pressed="true" disabled><i class="swatch graphite"></i>Grafito</button><button type="button" data-finish="copper" aria-pressed="false" disabled><i class="swatch copper"></i>Cobre</button><button type="button" data-finish="ivory" aria-pressed="false" disabled><i class="swatch ivory"></i>Marfil</button></div></fieldset>
+      <fieldset class="control-block"><legend>02 <span>Material</span></legend><p id="sculpture-material">Piedra · tallado y relieve</p><div class="materials" id="materials" hidden><button type="button" data-finish="stone" aria-pressed="false" disabled><i class="swatch stone"></i>Piedra</button><button type="button" data-finish="graphite" aria-pressed="true" disabled><i class="swatch graphite"></i>Grafito</button><button type="button" data-finish="copper" aria-pressed="false" disabled><i class="swatch copper"></i>Cobre</button><button type="button" data-finish="ivory" aria-pressed="false" disabled><i class="swatch ivory"></i>Marfil</button></div></fieldset>
       <fieldset class="control-block depth-control"><legend>03 <span>Profundidad</span></legend><div class="depth-row"><input id="depth" type="range" min="24" max="130" value="78" aria-label="Profundidad del logo" disabled /><output for="depth" id="depth-value">78</output></div></fieldset>
     </section>
     <div class="export-bar"><label class="checkbox"><input id="transparent" type="checkbox" /><span>PNG con fondo transparente</span></label><div class="export-actions"><button type="button" id="export-model" class="button secondary" disabled>Modelo 3D <span>.glb</span>${downloadIcon}</button><button type="button" id="export-image" class="button primary" disabled>Descargar imagen${downloadIcon}</button></div></div>
@@ -68,6 +68,8 @@ async function start() {
     button.addEventListener('click', () => {
       const piece = button.dataset.piece as Piece
       studio.setPiece(piece)
+      document.querySelector<HTMLElement>('#materials')!.hidden = piece === 'sculpture'
+      document.querySelector<HTMLElement>('#sculpture-material')!.hidden = piece !== 'sculpture'
       document.querySelectorAll('button[data-piece]').forEach(el => el.setAttribute('aria-pressed', String(el === button)))
       document.querySelector('#piece-label')!.textContent = ({ sculpture: '01 — Escultura mineral', logo: '02 — Logo completo', symbol: '03 — Isotipo' })[piece]
     })
@@ -93,7 +95,7 @@ async function start() {
       studio.setMotion(false)
       status.textContent = 'Preparando la descarga…'
       try {
-        const name = `giraffe-bio-${studio.piece}-${studio.finish}`
+        const name = `giraffe-bio-${studio.piece}-${studio.piece === 'sculpture' ? 'stone' : studio.finish}`
         if (format === 'model') {
           const buffer = await studio.exportModel()
           save(new Blob([buffer], { type: 'model/gltf-binary' }), `${name}.glb`)

@@ -1,4 +1,4 @@
-import { MeshPhysicalMaterial, MeshStandardMaterial } from 'three'
+import { MeshStandardMaterial } from 'three'
 import { CARVED_LOOK } from '../stone/carved-look'
 import { applyLook, applyTriplanar, createTriUniforms, type TriUniforms } from '../stone/triplanar'
 
@@ -20,8 +20,5 @@ export function createSculptureSurface(source: TriUniforms) {
   })
   applyTriplanar(material, uniforms)
   material.customProgramCacheKey = () => 'giraffe-sculpture-rock-v1'
-  const ivory = new MeshPhysicalMaterial({
-    name: 'Isologo lateral — marfil', color: '#e6e4df', roughness: .3, metalness: .08,
-  })
-  return { material, uniforms, ivory, dispose() { material.dispose(); ivory.dispose() } }
+  return { material, uniforms, dispose() { material.dispose() } }
 }
