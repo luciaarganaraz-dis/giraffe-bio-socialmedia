@@ -1,5 +1,6 @@
 import './styles/tokens.css'
 import './styles/studio.css'
+import './styles/sculpture.css'
 import { createStudio } from './studio'
 import { type Piece } from './logo'
 import { type Finish } from './materials'
@@ -17,17 +18,19 @@ app.innerHTML = `
   </header>
   <main>
     <div class="intro"><div><p class="eyebrow">GIRAFFE BIO. / EXPLORACIÓN 3D</p><h1>Una nueva dimensión.</h1></div><p class="intro-note">La misma identidad.<br />Ahora, con otra profundidad.</p></div>
+    <div class="scene-workspace" data-composition="sculpture">
     <section class="stage" aria-label="Vista interactiva del logo en tres dimensiones">
-      <div class="stage-top"><span id="piece-label">01 — Logo completo</span><span>ESTUDIO DE MATERIAL</span></div>
+      <div class="stage-top"><span id="piece-label">01 — Escultura mineral</span><span>ESTUDIO DE MATERIAL</span></div>
       <div class="viewer" id="viewer" tabindex="0" role="img" aria-label="Logo Giraffe bio. en 3D. Arrastrá para girar, usá la rueda o dos dedos para acercar. Con teclado, las flechas giran y las teclas más y menos acercan.">
         <img class="fallback" src="${import.meta.env.BASE_URL}giraffe-bio.svg" alt="" />
       </div>
       <div class="stage-bottom"><span class="drag-hint"><span aria-hidden="true">↔</span> Arrastrá para explorar</span><div class="view-actions"><button id="motion" type="button" aria-pressed="true" disabled>Pausar movimiento</button><button id="reset" class="icon-button" type="button" aria-label="Restablecer vista" title="Restablecer vista" disabled>${resetIcon}</button></div></div>
     </section>
     ${lightControlsMarkup()}
+    </div>
     <section class="controls" id="controls" aria-label="Personalizar logo">
-      <fieldset class="control-block"><legend>01 <span>Pieza</span></legend><div class="segmented" id="piece"><button type="button" data-piece="logo" aria-pressed="true" disabled>Logo completo</button><button type="button" data-piece="symbol" aria-pressed="false" disabled>Isotipo</button></div></fieldset>
-      <fieldset class="control-block"><legend>02 <span>Material</span></legend><div class="materials" id="materials"><button type="button" data-finish="stone" aria-pressed="true" disabled><i class="swatch stone"></i>Piedra</button><button type="button" data-finish="graphite" aria-pressed="false" disabled><i class="swatch graphite"></i>Grafito</button><button type="button" data-finish="copper" aria-pressed="false" disabled><i class="swatch copper"></i>Cobre</button><button type="button" data-finish="ivory" aria-pressed="false" disabled><i class="swatch ivory"></i>Marfil</button></div></fieldset>
+      <fieldset class="control-block"><legend>01 <span>Pieza</span></legend><div class="segmented" id="piece"><button type="button" data-piece="sculpture" aria-pressed="true" disabled>Escultura</button><button type="button" data-piece="logo" aria-pressed="false" disabled>Logo completo</button><button type="button" data-piece="symbol" aria-pressed="false" disabled>Isotipo</button></div></fieldset>
+      <fieldset class="control-block"><legend>02 <span>Material</span></legend><div class="materials" id="materials"><button type="button" data-finish="stone" aria-pressed="false" disabled><i class="swatch stone"></i>Piedra</button><button type="button" data-finish="graphite" aria-pressed="true" disabled><i class="swatch graphite"></i>Grafito</button><button type="button" data-finish="copper" aria-pressed="false" disabled><i class="swatch copper"></i>Cobre</button><button type="button" data-finish="ivory" aria-pressed="false" disabled><i class="swatch ivory"></i>Marfil</button></div></fieldset>
       <fieldset class="control-block depth-control"><legend>03 <span>Profundidad</span></legend><div class="depth-row"><input id="depth" type="range" min="24" max="130" value="78" aria-label="Profundidad del logo" disabled /><output for="depth" id="depth-value">78</output></div></fieldset>
     </section>
     <div class="export-bar"><label class="checkbox"><input id="transparent" type="checkbox" /><span>PNG con fondo transparente</span></label><div class="export-actions"><button type="button" id="export-model" class="button secondary" disabled>Modelo 3D <span>.glb</span>${downloadIcon}</button><button type="button" id="export-image" class="button primary" disabled>Descargar imagen${downloadIcon}</button></div></div>
@@ -61,12 +64,12 @@ async function start() {
   bindLightControls(settings => studio.setLight(settings))
   motion.addEventListener('click', () => studio.setMotion(!studio.moving))
   document.querySelector('#reset')!.addEventListener('click', () => studio.reset())
-  document.querySelectorAll<HTMLButtonElement>('[data-piece]').forEach(button => {
+  document.querySelectorAll<HTMLButtonElement>('button[data-piece]').forEach(button => {
     button.addEventListener('click', () => {
       const piece = button.dataset.piece as Piece
       studio.setPiece(piece)
-      document.querySelectorAll('[data-piece]').forEach(el => el.setAttribute('aria-pressed', String(el === button)))
-      document.querySelector('#piece-label')!.textContent = piece === 'logo' ? '01 — Logo completo' : '02 — Isotipo'
+      document.querySelectorAll('button[data-piece]').forEach(el => el.setAttribute('aria-pressed', String(el === button)))
+      document.querySelector('#piece-label')!.textContent = ({ sculpture: '01 — Escultura mineral', logo: '02 — Logo completo', symbol: '03 — Isotipo' })[piece]
     })
   })
   document.querySelectorAll<HTMLButtonElement>('[data-finish]').forEach(button => {

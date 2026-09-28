@@ -12,6 +12,8 @@ page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()) 
 try {
   await page.goto('http://127.0.0.1:5187')
   await page.waitForSelector('#viewer[data-ready="true"]')
+  await page.locator('button[data-piece="logo"]').click()
+  await page.locator('button[data-finish="stone"]').click()
   assert.equal(await page.locator('[data-finish="stone"]').getAttribute('aria-pressed'), 'true')
   assert.equal(await page.locator('#viewer').getAttribute('data-carved'), 'true')
   assert.ok(Number(await page.locator('#viewer').getAttribute('data-relief')) > .12, 'Stone must have physically displaced front faces')
@@ -34,7 +36,7 @@ try {
     assert.equal(await page.locator(`[data-finish="${finish}"]`).getAttribute('aria-pressed'), 'true')
     assert.equal(await page.locator('#viewer').getAttribute('data-carved'), String(finish === 'stone'))
   }
-  await page.locator('[data-piece="symbol"]').click()
+  await page.locator('button[data-piece="symbol"]').click()
   assert.equal(await page.locator('#viewer').getAttribute('data-meshes'), '5')
   await page.screenshot({ path: '.review/stone-symbol.png', fullPage: true })
   await page.locator('#depth').fill('52')

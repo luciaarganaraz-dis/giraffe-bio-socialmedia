@@ -10,7 +10,8 @@
     "check": "tsc --noEmit",
     "shots": "node scripts/review.mjs",
     "check:stone": "node scripts/check-stone.mjs",
-    "check:lighting": "node scripts/check-lighting.mjs"
+    "check:lighting": "node scripts/check-lighting.mjs",
+    "check:sculpture": "node scripts/check-sculpture.mjs"
   },
   "dependencies": {
     "three": "0.185.1",

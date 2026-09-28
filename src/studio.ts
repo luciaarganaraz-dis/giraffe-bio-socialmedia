@@ -10,6 +10,9 @@ import { createStoneSurface } from './stone/surface'
 import { CARVED_LOOK as LOOK } from './stone/carved-look'
 import { createStoneBackdrop } from './stone/backdrop'
 import { createLighting, type LightSettings } from './lighting'
+import { createSculpture } from './sculpture/model'
+import { createSculptureSurface } from './sculpture/surface'
+import { createSculptureBackground } from './sculpture/background'
 
 export async function createStudio(host: HTMLElement) {
   const response = await fetch(`${import.meta.env.BASE_URL}giraffe-bio.svg`)
@@ -40,11 +43,15 @@ export async function createStudio(host: HTMLElement) {
   const lighting = createLighting(renderer, scene, stone.lights)
   const backdrop = createStoneBackdrop(stone.uniforms)
   scene.add(backdrop.mesh)
-  let finish: Finish = 'stone'
+  const sculptureSurface = createSculptureSurface(stone.uniforms)
+  const sculptureBackground = createSculptureBackground()
+  scene.add(sculptureBackground.mesh)
+  let transparentCapture = false
+  let finish: Finish = 'graphite'
+  let piece: Piece = 'sculpture'
   updateLighting()
-  let piece: Piece = 'logo'
   let depth = 78
-  let model = createLogo(shapes, piece, depth, finish === 'stone' ? [stone.material, stone.material] : materials, finish === 'stone')
+  let model = makeModel()
   const pivot = new Group()
   pivot.add(model)
   scene.add(pivot)
@@ -72,7 +79,9 @@ export async function createStudio(host: HTMLElement) {
     const bounds = new Box3().setFromObject(model)
     const size = bounds.getSize(new Vector3())
     const aspect = width / height
-    const halfHeight = Math.max(size.y * 0.95, size.x / aspect * 0.62)
+    const halfHeight = piece === 'sculpture'
+      ? Math.max(size.y * .57, size.x / aspect * .62)
+      : Math.max(size.y * .95, size.x / aspect * .62)
     camera.left = -halfHeight * aspect
     camera.right = halfHeight * aspect
     camera.top = halfHeight
@@ -81,7 +90,9 @@ export async function createStudio(host: HTMLElement) {
   }
   function render() {
     lighting.update(camera)
-    backdrop.update(camera, pivot)
+    backdrop.mesh.visible = !transparentCapture && piece !== 'sculpture'
+    sculptureBackground.mesh.visible = !transparentCapture && piece === 'sculpture'
+    if (backdrop.mesh.visible) backdrop.update(camera, pivot)
     renderer.render(scene, camera)
   }
   function resize() {
@@ -95,7 +106,8 @@ export async function createStudio(host: HTMLElement) {
     camera.position.set(0, 0, 20)
     camera.zoom = 1
     controls.target.set(0, 0, 0)
-    pivot.rotation.set(0.24, -0.35, -0.025)
+    if (piece === 'sculpture') pivot.rotation.set(.035, -.62, .11)
+    else pivot.rotation.set(.24, -.35, -.025)
     pivot.position.y = 0
     phase = 0
     controls.update()
@@ -108,8 +120,8 @@ export async function createStudio(host: HTMLElement) {
     if (!visible || document.hidden) return
     if (moving && !interacting) {
       phase += dt * 0.45
-      pivot.rotation.y = -0.35 + Math.sin(phase) * 0.14
-      pivot.rotation.x = 0.24 + Math.sin(phase * 0.75) * 0.055
+      pivot.rotation.y = (piece === 'sculpture' ? -.62 : -.35) + Math.sin(phase) * .14
+      pivot.rotation.x = (piece === 'sculpture' ? .035 : .24) + Math.sin(phase * .75) * .055
       pivot.position.y = Math.sin(phase) * 0.045
     }
     controls.update()
@@ -166,7 +178,7 @@ export async function createStudio(host: HTMLElement) {
       else return
       render()
     },
-    setPiece(value: Piece) { piece = value; rebuild(); reset() },
+    setPiece(value: Piece) { piece = value; updateLighting(); rebuild(); reset() },
     setDepth(value: number) { depth = value; rebuild() },
     setFinish(value: Finish) {
       finish = value
@@ -175,6 +187,10 @@ export async function createStudio(host: HTMLElement) {
       rebuild()
     },
     async exportModel() {
+      if (piece === 'sculpture') {
+        const { exportSculpture } = await import('./sculpture/export')
+        return exportSculpture(model, renderer, sculptureSurface.uniforms, stone.uniforms)
+      }
       const { exportLogo } = await import('./stone/export')
       return exportLogo(model, finish === 'stone' ? { renderer, uniforms: stone.uniforms } : undefined)
     },
@@ -182,14 +198,14 @@ export async function createStudio(host: HTMLElement) {
       const originalSize = renderer.getSize(new Vector2())
       const originalRatio = renderer.getPixelRatio()
       const originalBackground = scene.background
-      const originalBackdrop = backdrop.mesh.visible
+      const originalTransparent = transparentCapture
       try {
         renderer.setPixelRatio(1)
-        const width = piece === 'symbol' ? 2048 : 3000
-        const height = piece === 'symbol' ? 2048 : 1500
+        const width = piece === 'sculpture' ? 2160 : piece === 'symbol' ? 2048 : 3000
+        const height = piece === 'sculpture' ? 2700 : piece === 'symbol' ? 2048 : 1500
         renderer.setSize(width, height, false)
         fit(width, height)
-        backdrop.mesh.visible = !transparent
+        transparentCapture = transparent
         scene.background = transparent ? null : new Color('#111316')
         render()
         return await new Promise<Blob>((resolve, reject) => renderer.domElement.toBlob(blob => {
@@ -198,7 +214,7 @@ export async function createStudio(host: HTMLElement) {
         }, 'image/png'))
       } finally {
         scene.background = originalBackground
-        backdrop.mesh.visible = originalBackdrop
+        transparentCapture = originalTransparent
         renderer.setPixelRatio(originalRatio)
         renderer.setSize(originalSize.x, originalSize.y, false)
         resize()
@@ -212,6 +228,8 @@ export async function createStudio(host: HTMLElement) {
       controls.dispose()
       disposeLogo(model)
       materials.forEach(material => material.dispose())
+      sculptureSurface.dispose()
+      sculptureBackground.dispose()
       backdrop.dispose()
       stone.dispose()
       environmentMap.dispose()
@@ -221,7 +239,9 @@ export async function createStudio(host: HTMLElement) {
   }
 
   function updateLighting() {
-    const rocky = finish === 'stone'
+    const rocky = finish === 'stone' || piece === 'sculpture'
+    host.closest('.scene-workspace')?.setAttribute('data-composition', piece)
+    lighting.setSculpture(piece === 'sculpture')
     host.closest('.stage')?.setAttribute('data-surface', finish)
     lighting.setFinish(rocky)
     scene.environment = rocky ? stone.environment : environmentMap.texture
@@ -230,16 +250,24 @@ export async function createStudio(host: HTMLElement) {
   }
 
   function measureModel() {
+    host.dataset.piece = piece
     host.dataset.meshes = String(model.children.length)
     host.dataset.carved = String(model.userData.carved)
     host.dataset.relief = String(Math.max(...model.children.map(child =>
       'geometry' in child ? (child as import('three').Mesh).geometry.userData.frontRelief ?? 0 : 0)))
   }
 
+  function makeModel() {
+    const selected = finish === 'stone' ? [stone.material, stone.material] : materials
+    return piece === 'sculpture'
+      ? createSculpture(shapes, depth, selected, sculptureSurface.material, sculptureSurface.ivory, finish === 'stone')
+      : createLogo(shapes, piece, depth, selected, finish === 'stone')
+  }
+
   function rebuild() {
     pivot.remove(model)
     disposeLogo(model)
-    model = createLogo(shapes, piece, depth, finish === 'stone' ? [stone.material, stone.material] : materials, finish === 'stone')
+    model = makeModel()
     pivot.add(model)
     measureModel()
     resize()

@@ -24,3 +24,13 @@ El GLB incluye la geometría y sus materiales; la iluminación, la cámara y el 
 - Exportación con fondo: alfa 255 en la esquina. Exportación transparente: alfa 0. Ambas restauran el fondo y el encuadre del visor.
 - Los controles siguen aplicados al cambiar a cobre y al isotipo. Sin errores de consola.
 - `pnpm check:lighting` y compilación de producción correctos. El detalle numérico está en `.review/lighting-report.json`.
+
+## Escultura mineral — 28 de septiembre de 2026
+
+- Monolito de roca oscura con el símbolo original en grafito al frente y en marfil sobre el lateral, revisado en el navegador. Panel de luz junto al visor.
+- 11 mallas: una roca cerrada y cinco piezas para cada aplicación del isotipo.
+- PNG 2160 × 2700 comprobado, con fondo gris y variante transparente (alfa 0 en las esquinas).
+- GLB reabierto y revisado: material de roca con tres mapas PBR incorporados y materiales independientes para los símbolos. La variante con símbolo de piedra incorpora seis mapas.
+- Luz, profundidad, cambio de material y regreso a Logo completo e Isotipo conservan los controles. Movimiento reducido revisado como composición estática.
+- `pnpm check:sculpture`, `pnpm check:lighting` y compilación de producción correctos; sin errores de consola en las comprobaciones.
+- El GLB conserva geometría y materiales; el grano fino del horneado es más suave que el render directo. No incluye el fondo ni la iluminación.

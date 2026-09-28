@@ -29,6 +29,8 @@ const pngInfo = async path => page.evaluate(async src => {
 try {
   await page.goto('http://127.0.0.1:5187')
   await page.waitForSelector('#viewer[data-ready="true"]')
+  await page.locator('button[data-piece="logo"]').click()
+  await page.locator('button[data-finish="stone"]').click()
   assert.equal(await page.locator('#transparent').isChecked(), false)
   const baseline = await pixels()
   assert.equal(baseline.cornerAlpha, 255, 'The stone backdrop must be in the actual scene')
@@ -77,7 +79,7 @@ try {
   await page.locator('[data-finish="copper"]').click()
   await slider('intensity', 140)
   assert.equal(JSON.parse(await page.locator('#viewer').getAttribute('data-light')).intensity, 140)
-  await page.locator('[data-piece="symbol"]').click()
+  await page.locator('button[data-piece="symbol"]').click()
   assert.equal(await page.locator('#viewer').getAttribute('data-meshes'), '5')
   assert.equal(JSON.parse(await page.locator('#viewer').getAttribute('data-light')).intensity, 140)
   await page.locator('[data-finish="stone"]').click()

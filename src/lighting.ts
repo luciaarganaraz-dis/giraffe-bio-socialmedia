@@ -17,8 +17,12 @@ export function createLighting(renderer: WebGLRenderer, scene: Scene, stoneLight
   const stoneFill = stoneLights.getObjectByName('fill') as DirectionalLight
   const stoneRim = stoneLights.getObjectByName('rim') as DirectionalLight
   let rocky = true
+  let sculpture = false
   const position = new Vector3()
   function update(camera: Camera) {
+    stoneKey.color.set(sculpture ? '#ffffff' : LOOK.lights.key.color)
+    stoneFill.color.set(sculpture ? '#ffffff' : LOOK.lights.fill.color)
+    stoneRim.color.set(sculpture ? '#ffffff' : LOOK.lights.rim.color)
     const move = (light: DirectionalLight, x: number, y: number, z: number) => {
       light.position.copy(position.set(x, y, z).applyQuaternion(camera.quaternion))
     }
@@ -27,17 +31,18 @@ export function createLighting(renderer: WebGLRenderer, scene: Scene, stoneLight
     move(stoneFill, 1, -3, 5)
     move(stoneRim, 5, 2, -4)
     move(rim, 6, 2, -4)
-    stoneKey.intensity = LOOK.keyLight * settings.intensity / 100
-    stoneFill.intensity = settings.fill / 100
-    stoneRim.intensity = LOOK.rimLight * settings.rim / 100
+    stoneKey.intensity = (sculpture ? 5 : LOOK.keyLight) * settings.intensity / 100
+    stoneFill.intensity = (sculpture ? .1 : 1) * settings.fill / 100
+    stoneRim.intensity = (sculpture ? 3.2 : LOOK.rimLight) * settings.rim / 100
     key.intensity = 3.5 * settings.intensity / 100
     rim.intensity = 2.2 * settings.rim / 100
     ambient.intensity = .9 * settings.fill / 30
-    scene.environmentIntensity = (rocky ? LOOK.envIntensity : 1) * settings.fill / 30
+    scene.environmentIntensity = (sculpture ? .025 : rocky ? LOOK.envIntensity : 1) * settings.fill / 30
     renderer.toneMappingExposure = (rocky ? LOOK.exposure : 1.35) * settings.exposure / 100
   }
   return {
     settings, update,
+    setSculpture(value: boolean) { sculpture = value },
     setFinish(stone: boolean) {
       rocky = stone
       studioLights.visible = !stone

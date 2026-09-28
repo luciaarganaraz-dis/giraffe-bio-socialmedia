@@ -8,6 +8,10 @@ export function atlasModel(source: Group, resolution: number) {
   clone.children.forEach((child, meshIndex) => {
     const mesh = child as Mesh
     const original = mesh.geometry
+    if (original.userData.atlasMode === 'existing') {
+      mesh.geometry = original.clone()
+      return
+    }
     const geometry = original.index ? original.toNonIndexed() : original.clone()
     geometry.computeBoundingBox()
     const box = geometry.boundingBox!

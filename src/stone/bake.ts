@@ -53,12 +53,13 @@ const fragmentShader = /* glsl */ `
 `
 
 /** Bake the actual source shader in UV space, so the GLB carries the same stone. */
-export function bakeStone(renderer: THREE.WebGLRenderer, model: THREE.Group, uniforms: TriUniforms, size: number) {
+export function bakeStone(renderer: THREE.WebGLRenderer, model: THREE.Group, uniforms: TriUniforms, size: number,
+  finish = { roughness: LOOK.roughness, metalness: LOOK.metalness }) {
   const target = new THREE.WebGLRenderTarget(size, size, { depthBuffer: false, stencilBuffer: false })
   const scene = new THREE.Scene()
   const camera = new THREE.OrthographicCamera()
   const material = new THREE.ShaderMaterial({
-    vertexShader, fragmentShader, uniforms: { ...uniforms, roughness: { value: LOOK.roughness }, metalness: { value: LOOK.metalness } },
+    vertexShader, fragmentShader, uniforms: { ...uniforms, roughness: { value: finish.roughness }, metalness: { value: finish.metalness } },
     defines: { BAKE_MODE: 0 }, side: THREE.DoubleSide, depthTest: false, depthWrite: false, toneMapped: false,
   })
   for (const child of model.children) {

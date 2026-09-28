@@ -5,7 +5,7 @@ import { sculptStone } from './stone/sculpt'
 import { logoUVs } from './stone/unwrap'
 import polygonClipping, { type Polygon, type Ring } from 'polygon-clipping'
 
-export type Piece = 'logo' | 'symbol'
+export type Piece = 'logo' | 'symbol' | 'sculpture'
 
 /** Union overlapping strokes before extrusion, especially the joined “ff”. */
 export function readLogo(svg: string) {

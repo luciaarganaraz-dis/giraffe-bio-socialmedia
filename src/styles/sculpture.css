@@ -1,0 +1,17 @@
+.scene-workspace[data-composition='sculpture'] { display: grid; grid-template-columns: minmax(0, 1fr) 260px; }
+.scene-workspace[data-composition='sculpture'] .viewer { height: min(70svh, 700px); min-height: 510px; }
+.scene-workspace[data-composition='sculpture'] .light-panel { border: 1px solid var(--rule); border-left: 0; padding: 24px; }
+.scene-workspace[data-composition='sculpture'] .light-heading { align-items: flex-start; flex-direction: column; gap: 10px; }
+.scene-workspace[data-composition='sculpture'] .light-heading button { padding-left: 0; }
+.scene-workspace[data-composition='sculpture'] .light-heading p { max-width: 170px; line-height: 1.5; }
+.scene-workspace[data-composition='sculpture'] .light-body { grid-template-columns: 1fr; gap: 26px; }
+.scene-workspace[data-composition='sculpture'] .light-position-control { gap: 12px; }
+.scene-workspace[data-composition='sculpture'] .light-pad { width: 94px; height: 94px; }
+.scene-workspace[data-composition='sculpture'] .light-sliders { grid-template-columns: 1fr; gap: 18px; }
+.scene-workspace[data-composition='sculpture'] .stage-bottom { color: var(--paper); }
+.segmented button { padding-inline: 12px; }
+@media (max-width: 680px) {
+  .scene-workspace[data-composition='sculpture'] { grid-template-columns: 1fr; }
+  .scene-workspace[data-composition='sculpture'] .light-panel { border-left: 1px solid var(--rule); border-top: 0; }
+  .scene-workspace[data-composition='sculpture'] .light-sliders { grid-template-columns: 1fr 1fr; }
+}
