@@ -61,3 +61,12 @@ El GLB incluye la geometría y sus materiales; la iluminación, la cámara y el 
 - Local, PNG y GLB revisados visualmente. Una malla y un material; GLB de aproximadamente 9.7 MB. Luz y textura conservadas.
 - `pnpm check:sculpture`, `pnpm check` y `pnpm build` correctos, sin errores de consola.
 - Movimiento conservado: giro lento con flotación sutil.
+
+## Costados fracturados — 28 de septiembre de 2026
+
+- Corrección centrada en el espesor: el costado del bloque tiene planos quebrados, salientes y una hendidura oblicua. Las paredes del isologo, tanto hundidas como salientes, también varían a lo largo de su profundidad. El frente mantiene la identidad del símbolo.
+- Revisión del local y del GLB de perfil, con piedra y con material neutro sin texturas. Capturas: `.review/sculpture-side.png` y `.review/sculpture-geometry.png`.
+- Trece cortes medidos en cada pared: desviación máxima respecto de un lateral recto de 0.209 unidades en la roca, 0.042 en el relieve y 0.071 en el vaciado. Las mismas mediciones coinciden al reabrir el GLB; no dependen del mapa de textura.
+- Las profundidades 24, 78 y 130 conservan tres vaciados y dos relieves. Una malla, un material y tres mapas PBR. PNG y GLB actualizados; este último pesa aproximadamente 12.5 MB.
+- `pnpm check:sculpture`, `pnpm check` y `pnpm build` correctos. Controles de luz, transparencia y exportación comprobados, sin errores de consola.
+- Movimiento conservado: giro lento con flotación sutil.

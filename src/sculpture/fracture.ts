@@ -1,4 +1,5 @@
 import { noise } from '../stone/erosion-noise'
+import { rockSidewall } from './sidewall'
 
 // Unequal edge losses, like pieces snapped away from a larger rock.
 const chips = [
@@ -21,9 +22,10 @@ export function fracturePoint(x: number, y: number, z: number): [number, number,
   const rough = noise(x * 2.1, y * 2.1, z * 2.1, 821) * .16
     + noise(x * 6.8, y * 6.8, z * 6.8, 531) * .055
     + noise(x * 19, y * 19, z * 19, 193) * .017
+  const [sideX, sideY] = rockSidewall(x, y, z)
   return [
-    x * shrink + rough * .6,
-    y * shrink + noise(x * 2.4, y * 2.4, z * 2.4, 57) * .095,
+    x * shrink + rough * .6 + sideX,
+    y * shrink + noise(x * 2.4, y * 2.4, z * 2.4, 57) * .095 + sideY,
     z + rough + (fault - .3) * .16 * edge,
   ]
 }
