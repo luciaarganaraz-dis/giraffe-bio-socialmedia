@@ -52,3 +52,12 @@ El GLB incluye la geometría y sus materiales; la iluminación, la cámara y el 
 - PNG y GLB regenerados; este último incorpora los tres mapas del nuevo acabado y pesa aproximadamente 9.9 MB.
 - `pnpm check:sculpture` confirma cavidades, salientes, controles de luz y descargas. Sin errores de consola. TypeScript y compilación de producción comprobados.
 - Movimiento conservado: giro lento y flotación sutil.
+
+## Forma irregular de la piedra — 28 de septiembre de 2026
+
+- Silueta asimétrica, parte superior inclinada, dorso más estrecho y espesor desigual. Cinco pérdidas de material de tamaños diferentes quiebran los bordes y continúan a través de las caras.
+- La variación de espesor en cinco cortes centrales pasó de 0.29 a 0.54 unidades de escena. Las concavidades ocupan un 16.04% de la envolvente convexa de la roca sin tallar, frente al 13.33% anterior. Medición guardada en `.review/shape-report.json`.
+- Se conservaron las cinco formas originales del isologo, con tres hundidas y dos salientes. Las mediciones en profundidades 24, 78 y 130 siguen pasando; el GLB reabierto conserva los vaciados.
+- Local, PNG y GLB revisados visualmente. Una malla y un material; GLB de aproximadamente 9.7 MB. Luz y textura conservadas.
+- `pnpm check:sculpture`, `pnpm check` y `pnpm build` correctos, sin errores de consola.
+- Movimiento conservado: giro lento con flotación sutil.

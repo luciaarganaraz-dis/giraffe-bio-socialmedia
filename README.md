@@ -81,6 +81,8 @@ El PNG incluye fondo e iluminación. Activar «PNG con fondo transparente» elim
 
 La composición se inspira en la referencia de Neurath X compartida el 28/09. La corrección de la diseñadora define **un solo isologo y el mismo material de piedra en toda la figura**. Las tres partes superiores/izquierdas se sustraen del bloque y las dos inferiores/derechas se unen en relieve. La pieza resultante es una sola malla; los huecos incluyen fondo y paredes interiores reales. El control de profundidad modifica ambos sentidos.
 
+La roca tiene una silueta asimétrica, espesor variable y bordes quebrados por pérdidas desiguales de material. Esas irregularidades existen en la geometría y se conservan al exportar.
+
 La textura usa las fracturas del mapa original de Giraffe bio a una escala mayor, con poco grano y sin relieve de arena. Un mismo acabado negro mate recorre el bloque y el isologo, incluidas las paredes talladas.
 
 La luz inicial toma la referencia: fuente rasante arriba/derecha, frente oscuro con relleno suave, contraluz contenido y sombras profundas dentro del tallado. «Restablecer luz» recupera esa iluminación. El fondo gris es más claro hacia abajo a la izquierda.
