@@ -1,7 +1,7 @@
 import { Raycaster, Vector3, type Object3D } from 'three'
 
 /** Sample the actual walls through their thickness, independently of textures. */
-export function wallProfiles(model: Object3D, center: number[], depth: number) {
+export function wallProfiles(model: Object3D, center: number[], depth: number, probes: { x: number; y: number; recessed: boolean }[]) {
   const offset = new Vector3().fromArray(center)
   const ray = new Raycaster()
   const profile = (x: number, y: number, start: number, end: number, direction: number) => {
@@ -18,9 +18,11 @@ export function wallProfiles(model: Object3D, center: number[], depth: number) {
   }
   const floor = 1.03 - (.22 + depth * .005)
   const crest = 1.03 + (.18 + depth * .005)
+  const right = probes.filter(probe => !probe.recessed).sort((a, b) => b.x - a.x)[0]
+  const left = probes.filter(probe => probe.recessed).sort((a, b) => a.x - b.x)[0]
   return {
     rock: profile(5, 0, -.7, .5, -1),
-    raised: profile(5, .353, 1.25, crest - .06, -1),
-    recessed: profile(-1.13, .174, floor + .07, .81, 1),
+    raised: profile(5, right.y, 1.25, crest - .06, -1),
+    recessed: profile(left.x, left.y, floor + .07, .81, 1),
   }
 }

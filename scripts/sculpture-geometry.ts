@@ -3,6 +3,7 @@ import { createSculpture } from '../src/sculpture/model'
 import { sculptureRock } from '../src/sculpture/rock'
 import { readLogo, disposeLogo } from '../src/logo'
 import { wallProfiles } from './sculpture-wall-profiles'
+import { sculptureContours } from './sculpture-contours'
 
 const shapes = readLogo(await (await fetch('/giraffe-bio.svg')).text())
 const material = new MeshStandardMaterial()
@@ -25,7 +26,8 @@ for (const depth of [24, 78, 130]) {
     return { ...probe, before, after: after + center.z, change: after + center.z - before }
   })
   reports.push({ depth, ms: performance.now() - start, probes,
-    walls: depth === 78 ? wallProfiles(model, relief.center, depth) : undefined,
+    contours: sculptureContours(model, shapes, relief.center, depth),
+    walls: depth === 78 ? wallProfiles(model, relief.center, depth, relief.probes) : undefined,
     bounds: new Box3().setFromObject(model).getSize(new Vector3()).toArray(), meshes: model.children.length })
   disposeLogo(model)
 }

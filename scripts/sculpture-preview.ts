@@ -8,6 +8,7 @@ import { createSculpture } from '../src/sculpture/model'
 import { createSculptureSurface } from '../src/sculpture/surface'
 import { readLogo } from '../src/logo'
 import { wallProfiles } from './sculpture-wall-profiles'
+import { sculptureContours } from './sculpture-contours'
 
 const params = new URLSearchParams(location.search)
 
@@ -29,6 +30,7 @@ lighting.setSculpture(true)
 const model = params.has('live')
   ? createSculpture(readLogo(await (await fetch('/giraffe-bio.svg')).text()), 78, createSculptureSurface(stone.uniforms).material)
   : (await new GLTFLoader().loadAsync('/exports/giraffe-bio-escultura.glb')).scene
+const originalShapes = readLogo(await (await fetch('/giraffe-bio.svg')).text())
 if (params.has('neutral')) {
   const neutral = new THREE.MeshStandardMaterial({ color: '#8a8a8a', roughness: .9 })
   model.traverse(object => { if (object instanceof THREE.Mesh) object.material = neutral })
@@ -38,7 +40,8 @@ model.updateMatrixWorld(true)
 model.traverse(object => {
   if (!object.userData.relief) return
   const { probes, center } = object.userData.relief
-  document.body.dataset.walls = JSON.stringify(wallProfiles(model, center, 78))
+  document.body.dataset.contours = JSON.stringify(sculptureContours(model, originalShapes, center, 78))
+  document.body.dataset.walls = JSON.stringify(wallProfiles(model, center, 78, probes))
   const offset = new THREE.Vector3().fromArray(center)
   const ray = new THREE.Raycaster()
   const result = probes.map((probe: { x: number; y: number; recessed: boolean }) => {
@@ -50,7 +53,8 @@ model.traverse(object => {
 })
 const pivot = new THREE.Group()
 pivot.add(model)
-pivot.rotation.set(.035, params.has('side') ? -1.25 : -.62, .11)
+if (params.has('front')) pivot.rotation.set(0, 0, 0)
+else pivot.rotation.set(.035, params.has('side') ? -1.25 : -.62, .11)
 scene.add(pivot)
 const size = new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3())
 const aspect = .8

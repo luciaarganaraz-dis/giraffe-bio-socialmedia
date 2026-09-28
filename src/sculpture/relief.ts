@@ -4,7 +4,8 @@ import { toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js'
 import { createLogo, disposeLogo, type readLogo } from '../logo'
 import { atlasModel } from '../stone/atlas'
 import { noise } from '../stone/erosion-noise'
-import { carvedSidewall } from './sidewall'
+import { carvedSidewallWear } from './sidewall'
+import { ISO_PLACEMENT, outlineDirection } from './placement'
 
 /** Five original SVG lobes, in a single placement; left/top sink into the rock. */
 export function reliefTools(shapes: ReturnType<typeof readLogo>, depth: number, material: Material) {
@@ -13,19 +14,26 @@ export function reliefTools(shapes: ReturnType<typeof readLogo>, depth: number, 
   disposeLogo(logo)
   const recessed: BufferGeometry[] = [], raised: BufferGeometry[] = []
   const probes: { x: number; y: number; recessed: boolean }[] = []
+  const entries = shapes.filter(entry => entry.isSymbol)
+  const placement = ISO_PLACEMENT
   atlas.updateMatrixWorld(true)
-  for (const child of atlas.children as Mesh[]) {
+  for (const [index, child] of (atlas.children as Mesh[]).entries()) {
     const bounds = new Box3().setFromObject(child)
     const center = bounds.getCenter(new Vector3())
     const inset = center.x < -.3 || center.y > .25
     const lower = inset ? 1.03 - (.22 + depth * .005) : .45
     const upper = inset ? 2.3 : 1.03 + (.18 + depth * .005)
+    const outline = entries[index].shape.getPoints(20).map(point => ({
+      x: (point.x * .01 + child.position.x) * placement.scale + placement.x,
+      y: (point.y * .01 + child.position.y) * placement.scale + placement.y,
+    }))
+    const direction = outlineDirection(outline)
     child.geometry.applyMatrix4(child.matrixWorld)
     // Subdivide at the final depth so the sidewalls have enough cross-sections.
     const source = child.geometry.getAttribute('position')
     for (let i = 0; i < source.count; i++) {
       const t = (source.getZ(i) - bounds.min.z) / (bounds.max.z - bounds.min.z)
-      source.setXYZ(i, source.getX(i) * 1.43 - .05, source.getY(i) * 1.43 + .1, lower + t * (upper - lower))
+      source.setXYZ(i, source.getX(i) * placement.scale + placement.x, source.getY(i) * placement.scale + placement.y, lower + t * (upper - lower))
     }
     const geometry = new TessellateModifier(.08, 12).modify(child.geometry)
     child.geometry.dispose()
@@ -35,8 +43,9 @@ export function reliefTools(shapes: ReturnType<typeof readLogo>, depth: number, 
       const x = positions.getX(i), y = positions.getY(i), z = positions.getZ(i)
       const weathering = noise(x * 2.1, y * 2.1, z * 2.1, 821) * .045
         + noise(x * 6.8, y * 6.8, z * 6.8, 531) * .012
-      const [sideX, sideY] = carvedSidewall(x, y, z, depth)
-      positions.setXYZ(i, x + sideX, y + sideY, z + weathering)
+      const [nx, ny] = direction(x, y)
+      const wear = carvedSidewallWear(x, y, z, depth, inset)
+      positions.setXYZ(i, x + nx * wear, y + ny * wear, z + weathering)
       uv.setX(i, .5 + uv.getX(i) * .5)
     }
     geometry.scale(100, 100, 100)
@@ -46,7 +55,7 @@ export function reliefTools(shapes: ReturnType<typeof readLogo>, depth: number, 
     geometry.clearGroups()
     const target = inset ? recessed : raised
     target.push(geometry)
-    probes.push({ x: center.x * 1.43 - .05, y: center.y * 1.43 + .1, recessed: inset })
+    probes.push({ x: center.x * placement.scale + placement.x, y: center.y * placement.scale + placement.y, recessed: inset })
   }
   return { recessed, raised, probes }
 }

@@ -89,10 +89,12 @@ La composición se inspira en la referencia de Neurath X compartida el 28/09. La
 
 La roca tiene una silueta asimétrica, espesor variable y bordes quebrados por pérdidas desiguales de material. Los costados cambian de sección a través del espesor, con fracturas, entrantes y salientes; también se quiebran las paredes interiores y exteriores del tallado. Esas irregularidades existen en la geometría y se conservan al exportar.
 
+El isologo conserva las cinco siluetas del SVG. Su tamaño y posición dejan margen dentro de la roca. El desgaste se aplica detrás del contorno visible, para que las paredes irregulares no tapen ni recorten las partes hundidas y salientes.
+
 La textura usa las fracturas del mapa original de Giraffe bio a una escala mayor, con poco grano y sin relieve de arena. Un mismo acabado negro mate recorre el bloque y el isologo, incluidas las paredes talladas.
 
 La luz inicial toma la referencia: fuente rasante arriba/derecha, frente oscuro con relleno suave, contraluz contenido y sombras profundas dentro del tallado. «Restablecer luz» recupera esa iluminación. El fondo gris es más claro hacia abajo a la izquierda.
 
 La cámara inicia en tres cuartos. El giro y la flotación son suaves; movimiento reducido mantiene una vista estática. Las luces se editan desde el panel lateral. El PNG de la escultura usa una composición vertical 4:5. El GLB incorpora un solo material con tres mapas PBR horneados a 2048 px; la iluminación y el fondo pertenecen al estudio.
 
-`pnpm check:sculpture` verifica la composición, controles, PNG vertical y transparente, GLB con un único material y regreso a logo/isotipo. Mide con rayos los fondos hundidos y las caras salientes respecto de la roca original en tres profundidades; repite la medición después de reabrir el GLB. Comprueba que los costados se aparten de una pared recta y captura el perfil con y sin textura. Las capturas quedan en `.review/sculpture-*.png`; los entregables están en `exports/giraffe-bio-escultura.png` y `.glb`.
+`pnpm check:sculpture` verifica la composición, controles, PNG vertical y transparente, GLB con un único material y regreso a logo/isotipo. Mide con rayos los fondos hundidos y las caras salientes respecto de la roca original en tres profundidades; compara 574 puntos repartidos por las cinco formas contra el SVG para detectar partes tapadas o recortadas. Repite la medición después de reabrir el GLB. Comprueba que los costados se aparten de una pared recta y captura frente y perfil sin textura. Las capturas quedan en `.review/sculpture-*.png`; los entregables están en `exports/giraffe-bio-escultura.png` y `.glb`.

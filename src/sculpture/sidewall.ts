@@ -21,16 +21,14 @@ export function rockSidewall(x: number, y: number, z: number): [number, number] 
   return [x / radius * side, y * .68 / radius * mask * breaks * .32]
 }
 
-/** The same depth-dependent warp for all five lobes keeps their gaps coherent. */
-export function carvedSidewall(x: number, y: number, z: number, depth: number): [number, number] {
+/** Remove stone behind the SVG contour; never push walls across its visible face. */
+export function carvedSidewallWear(x: number, y: number, z: number, depth: number, recessed: boolean) {
   const floor = 1.03 - (.22 + depth * .005)
   const crest = 1.03 + (.18 + depth * .005)
-  const t = Math.max(0, Math.min(1, (z - floor) / (crest - floor)))
+  const start = recessed ? floor : .85
+  const end = recessed ? Math.max(floor + .08, .76) : crest
+  const t = Math.max(0, Math.min(1, (z - start) / (end - start)))
   const mask = Math.sin(t * Math.PI)
-  return [
-    (facets(x * 3.2 + y * .7, z * 5.6 + y * 1.3, 719) * .16
-      + facets(x * 2.1 + y * .5, z * 17 + y * .6, 461) * .13) * mask,
-    (facets(y * 3.8 - x * .6, z * 5.2 - x * .9, 1231) * .14
-      + facets(y * 2.2 - x * .4, z * 15 - x * .7, 904) * .10) * mask,
-  ]
+  const chips = Math.abs(facets(x * 3 + y * .7, z * 17 + y * 1.3, 719))
+  return (recessed ? 1 : -1) * (.018 + chips * .065) * mask
 }

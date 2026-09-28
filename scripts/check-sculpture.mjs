@@ -85,33 +85,39 @@ try {
   await page.locator('canvas').screenshot({ path: '.review/sculpture-export.png' })
   const exportedRelief = JSON.parse(await page.locator('body').getAttribute('data-relief'))
   const exportedWalls = JSON.parse(await page.locator('body').getAttribute('data-walls'))
+  const exportedContours = JSON.parse(await page.locator('body').getAttribute('data-contours'))
+  exportedContours.forEach(contour => assert.equal(contour.coverage, 1, 'Every SVG lobe must remain whole in the exported mesh'))
   exportedRelief.forEach(probe => assert.ok(probe.recessed ? probe.z < .65 : probe.z > 1.35))
-  for (const query of ['side', 'side&neutral']) {
+  for (const query of ['side', 'side&neutral', 'front&neutral']) {
     await page.goto(`http://127.0.0.1:5187/__sculpture-review?${query}`)
     await page.waitForSelector('body[data-ready="true"]')
-    await page.locator('canvas').screenshot({ path: `.review/sculpture-${query.includes('neutral') ? 'geometry' : 'side'}.png` })
+    await page.locator('canvas').screenshot({ path: `.review/sculpture-${query.includes('front') ? 'contours' : query.includes('neutral') ? 'geometry' : 'side'}.png` })
   }
   await page.route('**/__geometry-review', route => route.fulfill({ contentType: 'text/html', body: '<html><body><script type="module" src="/scripts/sculpture-geometry.ts"></script></body></html>' }))
   await page.goto('http://127.0.0.1:5187/__geometry-review')
   await page.waitForSelector('body[data-ready="true"]')
   const geometry = JSON.parse(await page.locator('body').textContent())
-  geometry.forEach(({ probes, meshes }) => {
+  geometry.forEach(({ probes, meshes, contours }) => {
     assert.equal(meshes, 1)
     assert.equal(probes.filter(probe => probe.recessed).length, 3)
     assert.equal(probes.filter(probe => !probe.recessed).length, 2)
     probes.forEach(probe => assert.ok(probe.recessed ? probe.change < -.12 : probe.change > .12))
+    contours.forEach(contour => {
+      assert.ok(contour.sampled > 60)
+      assert.equal(contour.coverage, 1, 'The SVG footprint must have no missing or occluded fragments at any depth')
+    })
   })
   geometry[0].probes.forEach((probe, i) => {
     assert.ok(Math.abs(geometry[2].probes[i].change) > Math.abs(probe.change) + .35)
   })
-  for (const [wall, minimum] of Object.entries({ rock: .15, raised: .025, recessed: .04 })) {
+  for (const [wall, minimum] of Object.entries({ rock: .15, raised: .02, recessed: .02 })) {
     const profile = geometry[1].walls[wall]
     assert.ok(profile.samples.every(sample => Number.isFinite(sample.x)), `${wall}: every side ray must hit a wall`)
     assert.ok(profile.departure > minimum, `${wall}: the wall must break its straight extrusion through the depth`)
     assert.ok(Math.abs(exportedWalls[wall].departure - profile.departure) < .00001, `${wall}: GLB must preserve the fractured wall`)
   }
   assert.deepEqual(errors, [])
-  const report = { meshes: json.meshes.length, maps: json.images.length, portrait: [2160, 2700], transparentAlpha: alpha, light, noFill, resetLight, geometry, exportedRelief, exportedWalls, glbBytes: readFileSync('exports/giraffe-bio-escultura.glb').length, errors }
+  const report = { meshes: json.meshes.length, maps: json.images.length, portrait: [2160, 2700], transparentAlpha: alpha, light, noFill, resetLight, geometry, exportedRelief, exportedWalls, exportedContours, glbBytes: readFileSync('exports/giraffe-bio-escultura.glb').length, errors }
   writeFileSync('.review/sculpture-report.json', JSON.stringify(report, null, 2))
   console.log(JSON.stringify(report, null, 2))
 } finally { await browser.close() }

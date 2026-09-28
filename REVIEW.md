@@ -79,3 +79,12 @@ El GLB incluye la geometría y sus materiales; la iluminación, la cámara y el 
 - Guardar, restablecer, recuperar y recargar comprobados. La entrada numérica permite escribir valores completos y limita los valores fuera de rango. PNG con luz cálida/fría y PNG transparente verificados, sin alterar los ajustes del visor.
 - `pnpm check:light-studio`, `pnpm check:lighting`, `pnpm check:sculpture`, `pnpm check` y `pnpm build` correctos; sin errores de consola. La geometría y el GLB permanecen iguales. Las luces pertenecen al estudio y al PNG.
 - Movimiento conservado: giro lento con flotación sutil.
+
+## Isologo completo, sin fragmentos tapados — 28 de septiembre de 2026
+
+- Recuperados los contornos originales de las cinco formas del SVG. La erosión de las paredes ya no atraviesa ni tapa sus caras visibles: retira piedra hacia el interior del relieve y hacia el exterior del vaciado. La boca de los vaciados queda libre de la deformación lateral.
+- Escala del conjunto ajustada de 1.43 a 1.24 y posición 0.10/0.10, con margen dentro del bloque. Se mantienen tres partes hundidas y dos salientes, el material compartido y los costados fracturados de la piedra.
+- Comparación mediante 574 puntos repartidos por las cinco superficies: los 574 alcanzan la cara esperada en profundidades 24, 78 y 130. Repetido sobre el GLB reabierto con el mismo resultado. Captura frontal sin textura en `.review/sculpture-contours.png`.
+- Frente, vista de tres cuartos, perfil y exportación revisados visualmente. Las paredes conservan variación física a través del espesor. PNG y GLB actualizados; GLB de aproximadamente 12.2 MB, una malla y un material.
+- `pnpm check:sculpture`, `pnpm check` y `pnpm build` correctos, sin errores de consola. Se restauraron en el visor los valores de luz que la diseñadora estaba usando: posición horizontal 50, intensidad 90 y exposición 106.
+- Movimiento conservado: giro lento con flotación sutil.
