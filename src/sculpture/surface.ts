@@ -3,10 +3,12 @@ import { CARVED_LOOK } from '../stone/carved-look'
 import { applyLook, applyTriplanar, createTriUniforms, type TriUniforms } from '../stone/triplanar'
 
 export const SCULPTURE_LOOK = {
-  ...CARVED_LOOK, matrixColor: '#090909', veinColor: '#141414',
-  veinAmount: .6, veinScale: 1.8, veinSoftness: .25,
-  grain: .4, grainScale: 4, grainRelief: .04, scale: 2.1, relief: 1.2,
-  roughness: .5, matrixRough: .44, veinRough: .52, metalness: 0,
+  ...CARVED_LOOK, matrixColor: '#090909', veinColor: '#101010',
+  veinAmount: .6, veinScale: .8, veinSoftness: .25,
+  // Let the scanned fractures read at the scale of the rock, without sand-like grain.
+  scale: .5, relief: .95, antiTiling: .7,
+  grain: .12, grainScale: 2, grainRelief: 0, fleckAmount: 0,
+  roughness: .5, matrixRough: .45, veinRough: .5, roughMin: .45, roughMax: .93, metalness: 0,
 }
 
 export function createSculptureSurface(source: TriUniforms) {

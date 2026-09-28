@@ -44,3 +44,11 @@ El GLB incluye la geometría y sus materiales; la iluminación, la cámara y el 
 - PNG de escultura actualizado y revisado. La exportación transparente mantiene el alfa y restaura el fondo. La iluminación pertenece al estudio y al PNG; no cambia el material del GLB.
 - `pnpm check:sculpture`, `pnpm check:lighting`, `pnpm check` y `pnpm build` correctos. Sin errores de consola. Los controles también funcionan al volver a Logo completo e Isotipo.
 - Movimiento conservado: giro lento con flotación sutil; composición estática con movimiento reducido.
+
+## Textura de la escultura — 28 de septiembre de 2026
+
+- Fracturas del mapa de roca ampliadas 4.2 veces; relieve fino de grano desactivado y moteado mineral eliminado. Rugosidad mate con variación entre las caras. El bloque y el isologo usan el mismo material.
+- Se conservaron la geometría del tallado y la configuración de luz. Revisión visual del local, PNG y GLB reabierto.
+- PNG y GLB regenerados; este último incorpora los tres mapas del nuevo acabado y pesa aproximadamente 9.9 MB.
+- `pnpm check:sculpture` confirma cavidades, salientes, controles de luz y descargas. Sin errores de consola. TypeScript y compilación de producción comprobados.
+- Movimiento conservado: giro lento y flotación sutil.

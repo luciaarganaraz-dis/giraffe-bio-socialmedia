@@ -81,6 +81,8 @@ El PNG incluye fondo e iluminación. Activar «PNG con fondo transparente» elim
 
 La composición se inspira en la referencia de Neurath X compartida el 28/09. La corrección de la diseñadora define **un solo isologo y el mismo material de piedra en toda la figura**. Las tres partes superiores/izquierdas se sustraen del bloque y las dos inferiores/derechas se unen en relieve. La pieza resultante es una sola malla; los huecos incluyen fondo y paredes interiores reales. El control de profundidad modifica ambos sentidos.
 
+La textura usa las fracturas del mapa original de Giraffe bio a una escala mayor, con poco grano y sin relieve de arena. Un mismo acabado negro mate recorre el bloque y el isologo, incluidas las paredes talladas.
+
 La luz inicial toma la referencia: fuente rasante arriba/derecha, frente oscuro con relleno suave, contraluz contenido y sombras profundas dentro del tallado. «Restablecer luz» recupera esa iluminación. El fondo gris es más claro hacia abajo a la izquierda.
 
 La cámara inicia en tres cuartos. El giro y la flotación son suaves; movimiento reducido mantiene una vista estática. Las luces se editan desde el panel lateral. El PNG de la escultura usa una composición vertical 4:5. El GLB incorpora un solo material con tres mapas PBR horneados a 2048 px; la iluminación y el fondo pertenecen al estudio.
