@@ -4,7 +4,7 @@ import { atlasModel, disposeAtlas } from './atlas'
 import { bakeStone } from './bake'
 import type { TriUniforms } from './triplanar'
 
-type StoneSource = { renderer: WebGLRenderer; uniforms: TriUniforms }
+type StoneSource = { renderer: WebGLRenderer; uniforms: TriUniforms; finish: Pick<MeshStandardMaterial, 'roughness' | 'metalness'> }
 
 export async function exportLogo(source: Group, stone?: StoneSource) {
   if (!stone) return new GLTFExporter().parseAsync(source, { binary: true }) as Promise<ArrayBuffer>
@@ -12,7 +12,7 @@ export async function exportLogo(source: Group, stone?: StoneSource) {
   let maps: Texture[] = []
   let material: MeshStandardMaterial | undefined
   try {
-    maps = bakeStone(stone.renderer, model, stone.uniforms, 2048)
+    maps = bakeStone(stone.renderer, model, stone.uniforms, 2048, stone.finish)
     material = new MeshStandardMaterial({
       name: 'Giraffe Bio — piedra gris esculpida (PBR)', color: 'white',
       map: maps[0], roughnessMap: maps[1], metalnessMap: maps[1], normalMap: maps[2],

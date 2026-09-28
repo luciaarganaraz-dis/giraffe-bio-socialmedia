@@ -13,6 +13,9 @@ import { createLighting, type LightSettings } from './lighting'
 import { createSculpture } from './sculpture/model'
 import { createSculptureSurface } from './sculpture/surface'
 import { createSculptureBackground } from './sculpture/background'
+import { createTextureController, textureDefaults, type TextureSettings } from './giraffe/texture'
+import { SCULPTURE_LOOK } from './sculpture/surface'
+import type { GiraffeLightSettings } from './giraffe/settings'
 
 export async function createStudio(host: HTMLElement) {
   const response = await fetch(`${import.meta.env.BASE_URL}giraffe-bio.svg`)
@@ -45,6 +48,9 @@ export async function createStudio(host: HTMLElement) {
   scene.add(backdrop.mesh)
   const sculptureSurface = createSculptureSurface(stone.uniforms)
   const sculptureBackground = createSculptureBackground()
+  const sculptureTexture = createTextureController(sculptureSurface.material, sculptureSurface.uniforms, SCULPTURE_LOOK)
+  const stoneTexture = createTextureController(stone.material, stone.uniforms, LOOK)
+  let textureSettings = textureDefaults()
   scene.add(sculptureBackground.mesh)
   let transparentCapture = false
   let finish: Finish = 'graphite'
@@ -120,6 +126,7 @@ export async function createStudio(host: HTMLElement) {
     if (!visible || document.hidden) return
     if (moving && !interacting) {
       phase += dt * 0.45
+      lighting.advance(dt)
       pivot.rotation.y = (piece === 'sculpture' ? -.62 : -.35) + Math.sin(phase) * .14
       pivot.rotation.x = (piece === 'sculpture' ? .035 : .24) + Math.sin(phase * .75) * .055
       pivot.position.y = Math.sin(phase) * 0.045
@@ -160,6 +167,21 @@ export async function createStudio(host: HTMLElement) {
       host.dataset.light = JSON.stringify(lighting.settings)
       render()
     },
+    setGiraffeLight(settings: GiraffeLightSettings) {
+      lighting.setOriginal(settings)
+      host.dataset.giraffeLight = JSON.stringify(settings)
+      render()
+    },
+    setLightingMode(mode: 'sculpture' | 'giraffe') {
+      lighting.setMode(mode); host.dataset.lightingMode = mode; render()
+    },
+    setTexture(settings: TextureSettings) {
+      textureSettings = settings
+      sculptureTexture(settings); stoneTexture(settings)
+      host.dataset.texture = JSON.stringify(settings)
+      model.userData.texture = { ...settings }
+      render()
+    },
     key(event: KeyboardEvent) {
       const directions: Record<string, [number, number]> = {
         ArrowLeft: [0, -0.1], ArrowRight: [0, 0.1], ArrowUp: [-0.1, 0], ArrowDown: [0.1, 0],
@@ -189,10 +211,10 @@ export async function createStudio(host: HTMLElement) {
     async exportModel() {
       if (piece === 'sculpture') {
         const { exportSculpture } = await import('./sculpture/export')
-        return exportSculpture(model, renderer, sculptureSurface.uniforms)
+        return exportSculpture(model, renderer, sculptureSurface.uniforms, sculptureSurface.material)
       }
       const { exportLogo } = await import('./stone/export')
-      return exportLogo(model, finish === 'stone' ? { renderer, uniforms: stone.uniforms } : undefined)
+      return exportLogo(model, finish === 'stone' ? { renderer, uniforms: stone.uniforms, finish: stone.material } : undefined)
     },
     async capture(transparent: boolean) {
       const originalSize = renderer.getSize(new Vector2())
@@ -251,6 +273,7 @@ export async function createStudio(host: HTMLElement) {
   }
 
   function measureModel() {
+    model.userData.texture = { ...textureSettings }
     host.dataset.piece = piece
     host.dataset.meshes = String(model.children.length)
     host.dataset.carved = String(model.userData.carved)

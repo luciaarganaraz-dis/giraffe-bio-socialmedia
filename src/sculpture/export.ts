@@ -3,14 +3,13 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js'
 import { atlasModel, disposeAtlas } from '../stone/atlas'
 import { bakeStone } from '../stone/bake'
 import type { TriUniforms } from '../stone/triplanar'
-import { SCULPTURE_LOOK } from './surface'
 
-export async function exportSculpture(source: Group, renderer: WebGLRenderer, uniforms: TriUniforms) {
+export async function exportSculpture(source: Group, renderer: WebGLRenderer, uniforms: TriUniforms, finish: Pick<MeshStandardMaterial, 'roughness' | 'metalness'>) {
   const model = atlasModel(source, 2048)
   let maps: Texture[] = []
   let material: MeshStandardMaterial | undefined
   try {
-    maps = bakeStone(renderer, model, uniforms, 2048, SCULPTURE_LOOK)
+    maps = bakeStone(renderer, model, uniforms, 2048, finish)
     material = new MeshStandardMaterial({
       name: 'Piedra tallada — PBR',
       map: maps[0], roughnessMap: maps[1], metalnessMap: maps[1], normalMap: maps[2],

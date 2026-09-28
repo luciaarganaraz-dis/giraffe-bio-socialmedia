@@ -97,3 +97,15 @@ El GLB incluye la geometría y sus materiales; la iluminación, la cámara y el 
 - Revisados el frente sin textura y el acercamiento del local con la luz de la diseñadora restaurada y profundidad 28. Captura sin controles en `exports/giraffe-bio-isologo-hundido.png` (518 × 550). PNG general de 2160 × 2700 y GLB actualizados, este último de aproximadamente 13.6 MB.
 - `pnpm check:sculpture`, `pnpm check` y `pnpm build` correctos. Controles de luz, exportación y transparencia verificados, sin errores de consola en las pruebas.
 - Movimiento pausado para la captura; se conserva el giro lento con flotación sutil al activarlo.
+
+
+## Parámetros del estudio Giraffe original — 28 de septiembre de 2026
+
+- Incorporados los nueve ajustes de textura del Q2 original y su base Original 004_v2. Paleta y parámetros de `LOOK` conservados; la base Piedra tallada actual sigue disponible. Geometría intacta: cinco vaciados, una malla y un material.
+- Seis luces editables con los valores originales, tipos Sol/Puntual/Foco/Área, color, potencia, posición y orientación; apertura/difusión del foco y dimensiones/giro del área. Ambiente y exposición independientes. Órbita opcional en 15 segundos, inicialmente apagada. La principal tiene sombras para leer las cavidades; el área no proyecta sombra directa en WebGL.
+- Revisión visual en el local y en capturas de ambos paneles. El panel de textura deja el visor disponible durante la edición. Se respetó el alcance de social media sin otra pasada de resoluciones.
+- `check:giraffe` verifica cambios reales en los píxeles de cada control, las seis lámparas aisladas por encendido y los cuatro tipos por potencia. Verifica orientación/apertura/difusión del foco, forma del área, ambiente, exposición, independencia de material y luz, y persistencia tras recargar. Sin errores de consola.
+- GLB comparado antes y después de bajar rugosidad: cambia el mapa de rugosidad/metal; color y normales permanecen idénticos. Incluye una malla, un material y tres mapas. El PNG de muestra del original es 2160 × 2700.
+- Movimiento conservado: giro lento y flotación sutil; las luces pueden completar una órbita de 15 segundos al activar esa opción.
+
+- Comprobaciones finales: `pnpm check`, `pnpm build`, `check:giraffe`, `check:light-studio` y `check:sculpture` correctas. La última repitió las 574 muestras del isologo en tres profundidades y en el GLB, todas intactas.

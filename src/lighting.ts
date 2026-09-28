@@ -1,6 +1,9 @@
 import { AmbientLight, Camera, Color, DirectionalLight, Group, Scene, SpotLight, Vector3, type WebGLRenderer } from 'three'
 import { CARVED_LOOK as LOOK } from './stone/carved-look'
 import { DEFAULT_LIGHT, type LightSettings } from './light-settings'
+import { LOOK as ORIGINAL } from './stone/look'
+import { createQ2StudioLighting } from './giraffe/lighting-rig'
+import { giraffeLightDefaults, type GiraffeLightSettings } from './giraffe/settings'
 export { DEFAULT_LIGHT, type LightSettings } from './light-settings'
 
 /** Light positions can follow the camera or stay fixed in the studio. */
@@ -15,6 +18,11 @@ export function createLighting(renderer: WebGLRenderer, scene: Scene, stoneLight
   accent.decay = 0
   scene.add(studioLights, accent, accent.target)
   const settings = { ...DEFAULT_LIGHT }
+  const originalRig = createQ2StudioLighting()
+  scene.add(originalRig.group)
+  let originalSettings = giraffeLightDefaults()
+  let mode: 'sculpture' | 'giraffe' = 'sculpture'
+  let orbit = 0
   const stoneKey = stoneLights.getObjectByName('key') as DirectionalLight
   const stoneFill = stoneLights.getObjectByName('fill') as DirectionalLight
   const stoneRim = stoneLights.getObjectByName('rim') as DirectionalLight
@@ -31,6 +39,19 @@ export function createLighting(renderer: WebGLRenderer, scene: Scene, stoneLight
   let sculpture = false
   const position = new Vector3(), tint = new Color()
   function update(camera: Camera) {
+    const original = mode === 'giraffe'
+    originalRig.group.visible = original
+    studioLights.visible = !original && !rocky
+    stoneLights.visible = !original && rocky
+    accent.visible = !original
+    if (original) {
+      originalRig.update(originalSettings.lamps, originalSettings.intensity)
+      originalRig.group.rotation.y = originalSettings.orbit ? orbit : 0
+      scene.environmentIntensity = ORIGINAL.envIntensity * originalSettings.environment / 100
+      scene.environmentRotation.y = originalSettings.rotation * Math.PI / 180 + originalRig.group.rotation.y
+      renderer.toneMappingExposure = ORIGINAL.exposure * originalSettings.exposure / 100
+      return
+    }
     const move = (object: DirectionalLight | SpotLight | typeof accent.target, x: number, y: number, z: number) => {
       position.set(x, y, z)
       if (object !== accent.target && position.lengthSq() < .01) position.z = .1
@@ -75,10 +96,14 @@ export function createLighting(renderer: WebGLRenderer, scene: Scene, stoneLight
   }
   return {
     settings, update,
+    setMode(value: 'sculpture' | 'giraffe') { mode = value },
+    setOriginal(value: GiraffeLightSettings) { originalSettings = value },
+    advance(dt: number) { orbit = (orbit + dt * Math.PI * 2 / 15) % (Math.PI * 2) },
     setSculpture(value: boolean) { sculpture = value },
     setFinish(stone: boolean) { rocky = stone; studioLights.visible = !stone; stoneLights.visible = stone },
     set(patch: Partial<LightSettings>) { Object.assign(settings, patch) },
     dispose() {
+      originalRig.dispose()
       for (const light of [key, fill, rim, ambient, accent]) light.dispose()
       scene.remove(studioLights, accent, accent.target)
     },

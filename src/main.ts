@@ -4,7 +4,10 @@ import './styles/sculpture.css'
 import { createStudio } from './studio'
 import { type Piece } from './logo'
 import { type Finish } from './materials'
-import { lightControlsMarkup, bindLightControls } from './light-controls'
+import { bindLightControls } from './light-controls'
+import { workbenchMarkup, bindWorkbench } from './giraffe/workbench'
+import { bindGiraffeLight } from './giraffe/light-panel'
+import { bindTexture } from './giraffe/texture-panel'
 
 const downloadIcon = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4" stroke="currentColor" stroke-width="1.5"/></svg>'
 const resetIcon = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 10a8 8 0 1 1 .7 6M4 4v6h6" stroke="currentColor" stroke-width="1.5"/></svg>'
@@ -26,7 +29,7 @@ app.innerHTML = `
       </div>
       <div class="stage-bottom"><span class="drag-hint"><span aria-hidden="true">↔</span> Arrastrá para explorar</span><div class="view-actions"><button id="motion" type="button" aria-pressed="true" disabled>Pausar movimiento</button><button id="reset" class="icon-button" type="button" aria-label="Restablecer vista" title="Restablecer vista" disabled>${resetIcon}</button></div></div>
     </section>
-    ${lightControlsMarkup()}
+    ${workbenchMarkup()}
     </div>
     <section class="controls" id="controls" aria-label="Personalizar logo">
       <fieldset class="control-block"><legend>01 <span>Pieza</span></legend><div class="segmented" id="piece"><button type="button" data-piece="sculpture" aria-pressed="true" disabled>Escultura</button><button type="button" data-piece="logo" aria-pressed="false" disabled>Logo completo</button><button type="button" data-piece="symbol" aria-pressed="false" disabled>Isotipo</button></div></fieldset>
@@ -62,6 +65,9 @@ async function start() {
   updateMotion(studio.moving)
   status.textContent = ''
   bindLightControls(settings => studio.setLight(settings))
+  bindGiraffeLight(settings => studio.setGiraffeLight(settings))
+  bindTexture(settings => studio.setTexture(settings))
+  bindWorkbench(mode => studio.setLightingMode(mode))
   motion.addEventListener('click', () => studio.setMotion(!studio.moving))
   document.querySelector('#reset')!.addEventListener('click', () => studio.reset())
   document.querySelectorAll<HTMLButtonElement>('button[data-piece]').forEach(button => {

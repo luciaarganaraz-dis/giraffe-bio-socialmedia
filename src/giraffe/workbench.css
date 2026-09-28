@@ -1,0 +1,19 @@
+.workbench { display: flex; flex-direction: column; min-height: 0; border: 1px solid var(--rule); border-left: 0; background: var(--paper); }
+.workbench [hidden] { display: none !important; }
+.workbench-tabs { display: flex; border-bottom: 1px solid var(--rule); flex: 0 0 auto; }
+.workbench-tabs button { flex: 1; padding: 14px; border: 0; background: transparent; font-size: 12px; color: var(--muted); }
+.workbench-tabs button[aria-pressed='true'] { color: var(--ink); box-shadow: inset 0 -2px var(--accent); }
+.workbench-body, .inspector-panel { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.workbench .light-panel, .inspector-panel { border: 0; height: auto !important; flex: 1; min-height: 0; padding: 16px 20px; }
+.workbench .light-panel { padding-top: 0; }
+.inspector-scroll { min-height: 0; overflow: auto; scrollbar-width: thin; padding-right: 8px; overscroll-behavior: contain; }
+.inspector-select { display: grid; gap: 8px; font-size: 11px; margin-bottom: 16px; }
+.inspector-select select { width: 100%; padding: 9px 7px; font: inherit; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); }
+.light-setup { flex: 0 0 auto; margin: 16px 20px 10px; }
+.inspector-memory { font-size: 9px; line-height: 1.5; color: var(--muted); margin: auto 0 0; padding-top: 12px; }
+.inspector-reset { border: 1px solid var(--rule); padding: 8px; background: transparent; font-size: 11px; }
+.inspector-panel .light-value input { width: 55px; }
+#texture-panel .light-note { margin: 0 0 16px; }
+.scene-workspace[data-composition='sculpture'] .workbench { height: max(512px, min(calc(70svh + 2px), 702px)); }
+.scene-workspace:not([data-composition='sculpture']) .workbench { max-height: 820px; }
+@media (max-width: 680px) { .workbench { border-left: 1px solid var(--rule); border-top: 0; } }

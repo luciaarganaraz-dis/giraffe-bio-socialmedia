@@ -100,3 +100,14 @@ La cámara inicia en tres cuartos. El giro y la flotación son suaves; movimient
 `pnpm check:sculpture` verifica la composición, controles, PNG vertical y transparente, GLB con un único material y regreso a logo/isotipo. Mide con rayos los cinco fondos hundidos respecto de la roca original en tres profundidades; compara 574 puntos repartidos por las cinco formas contra el SVG para detectar partes tapadas o recortadas. Repite la medición después de reabrir el GLB. Comprueba que los costados se aparten de una pared recta y captura frente y perfil sin textura. Las capturas quedan en `.review/sculpture-*.png`; los entregables están en `exports/giraffe-bio-escultura.png` y `.glb`.
 
 La captura `exports/giraffe-bio-isologo-hundido.png` muestra un acercamiento sin controles, con profundidad 28 y la iluminación que estaba usando la diseñadora.
+
+
+## Controles del Giraffe Bio original
+
+El panel lateral tiene pestañas **Luz** y **Textura**. En Luz, el selector de esquema permite elegir el estudio actual o **Giraffe original · 6 luces**, adaptado de los controles Q2 del repo Giraffe bio (revisión `002f979`). Cada una de las seis lámparas admite tipo Sol, Puntual, Foco o Área; encendido, potencia, color, posición y orientación. El foco añade apertura y difusión; el área, ancho, alto y giro. El ambiente tiene intensidad de reflejos, rotación y exposición independientes. La órbita opcional completa una vuelta en 15 segundos y se pausa con el visor. Sólo la principal proyecta sombras; una luz de área no proyecta sombra directa en este renderizador.
+
+En Textura se elige **Piedra tallada actual** o **Giraffe · Original 004_v2**. Los nueve ajustes son escala, relieve de superficie, detalle escaneado, vetas, rugosidad, cantidad y tamaño del mineral dorado, motas y brillo. El 100% corresponde a los valores de la base elegida. Los ajustes Giraffe se guardan automáticamente. Restablecer afecta sólo a su panel; cambiar la textura mantiene la luz y el tallado.
+
+El PNG incluye el material editado y la iluminación. El GLB conserva la geometría y hornea los valores reales de rugosidad y metal, además de los uniformes de textura; no incluye la iluminación del estudio. `exports/giraffe-bio-original-004-v2.png` es una muestra con los valores originales.
+
+`pnpm check:giraffe` comprueba cambios de píxeles para los nueve controles de textura, las seis luces y sus cuatro tipos, ambiente, exposición y foco. También comprueba independencia de luz y material, guardado tras recargar y que cambiar rugosidad modifique sólo el mapa correspondiente del GLB.

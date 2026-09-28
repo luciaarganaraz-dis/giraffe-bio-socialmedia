@@ -12,7 +12,8 @@
     "check:stone": "node scripts/check-stone.mjs",
     "check:lighting": "node scripts/check-lighting.mjs",
     "check:light-studio": "node scripts/check-light-studio.mjs",
-    "check:sculpture": "node scripts/check-sculpture.mjs"
+    "check:sculpture": "node scripts/check-sculpture.mjs",
+    "check:giraffe": "node scripts/check-giraffe-controls.mjs"
   },
   "dependencies": {
     "polygon-clipping": "0.15.7",
