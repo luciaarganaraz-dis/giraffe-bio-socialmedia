@@ -1,4 +1,4 @@
-import { MeshStandardMaterial } from 'three'
+import { MeshPhysicalMaterial } from 'three'
 import { CARVED_LOOK } from '../stone/carved-look'
 import { applyLook, applyTriplanar, createTriUniforms, type TriUniforms } from '../stone/triplanar'
 
@@ -17,7 +17,7 @@ export function createSculptureSurface(source: TriUniforms) {
   uniforms.uTriArm = source.uTriArm
   uniforms.uNoise3D = source.uNoise3D
   applyLook(SCULPTURE_LOOK, uniforms)
-  const material = new MeshStandardMaterial({
+  const material = new MeshPhysicalMaterial({
     name: 'Roca negra', roughness: SCULPTURE_LOOK.roughness, metalness: SCULPTURE_LOOK.metalness,
   })
   applyTriplanar(material, uniforms)

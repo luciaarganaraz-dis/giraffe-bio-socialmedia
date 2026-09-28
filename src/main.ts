@@ -8,6 +8,7 @@ import { bindLightControls } from './light-controls'
 import { workbenchMarkup, bindWorkbench } from './giraffe/workbench'
 import { bindGiraffeLight } from './giraffe/light-panel'
 import { bindTexture } from './giraffe/texture-panel'
+import { bindParameters } from './parameters/controls'
 
 const downloadIcon = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4" stroke="currentColor" stroke-width="1.5"/></svg>'
 const resetIcon = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 10a8 8 0 1 1 .7 6M4 4v6h6" stroke="currentColor" stroke-width="1.5"/></svg>'
@@ -68,6 +69,7 @@ async function start() {
   bindGiraffeLight(settings => studio.setGiraffeLight(settings))
   bindTexture(settings => studio.setTexture(settings))
   bindWorkbench(mode => studio.setLightingMode(mode))
+  bindParameters(studio)
   motion.addEventListener('click', () => studio.setMotion(!studio.moving))
   document.querySelector('#reset')!.addEventListener('click', () => studio.reset())
   document.querySelectorAll<HTMLButtonElement>('button[data-piece]').forEach(button => {

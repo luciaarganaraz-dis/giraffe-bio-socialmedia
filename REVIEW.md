@@ -109,3 +109,13 @@ El GLB incluye la geometría y sus materiales; la iluminación, la cámara y el 
 - Movimiento conservado: giro lento y flotación sutil; las luces pueden completar una órbita de 15 segundos al activar esa opción.
 
 - Comprobaciones finales: `pnpm check`, `pnpm build`, `check:giraffe`, `check:light-studio` y `check:sculpture` correctas. La última repitió las 574 muestras del isologo en tres profundidades y en el GLB, todas intactas.
+
+
+## Inspector de material, cámara y render — 28 de septiembre de 2026
+
+- Siete pestañas: Luz, Textura, Material, Cámara, Objeto, Render y Textura avanzada. Parámetros físicos y procedurales conectados al render; temperatura y sombras por luz; formatos de imagen y descarga de ajustes JSON. Revisión visual del local y capturas de Material/Cámara en `.review/parameters-*-panel.png`.
+- `check:parameters` confirma cambios renderizados de color, rugosidad, metal, IOR, especular, coat, sheen, anisotropía, película fina, transmisión, alfa, emisión, vetas y marcas de relieve. Comprueba temperatura y sombras, perspectiva/focal/giro, encuadre numérico y por arrastre, y persistencia de escala tras redimensionar. Se corrigió la inercia de órbita al introducir valores exactos de cámara.
+- PNG personalizado verificado en 320 × 400 px (640 × 800 al 50%). GLB con una malla y un material: IOR 1.7 y coat 0.7 presentes en sus extensiones físicas, escala X 0.8 y posición X 0.3 conservadas. JSON y recarga mantienen valores de material, cámara, objeto y render. Sin errores de consola.
+- `check:giraffe` sigue pasando: seis luces, cuatro tipos, nueve ajustes de textura, guardado y mapas exportados. `check:sculpture` vuelve a comprobar los 574 puntos del SVG a tres profundidades y en el GLB: todos llegan al fondo correspondiente; los cinco huecos permanecen completos. Sin errores de consola.
+- Alcance: visor de Three.js con controles compatibles con conceptos de Blender, no Cycles ni nodos, subsurface o profundidad de campo. Material y textura avanzados corresponden a los acabados de piedra. El GLB incluye material físico y transformaciones; no luces ni cámara activa. No se agregó otra pasada de resoluciones de interfaz por tratarse de piezas para redes.
+- Movimiento conservado: giro lento y flotación sutil; órbita opcional de luces en 15 segundos.

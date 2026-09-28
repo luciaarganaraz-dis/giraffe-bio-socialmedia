@@ -96,6 +96,7 @@ export function createLighting(renderer: WebGLRenderer, scene: Scene, stoneLight
   }
   return {
     settings, update,
+    get originalSettings() { return structuredClone(originalSettings) },
     setMode(value: 'sculpture' | 'giraffe') { mode = value },
     setOriginal(value: GiraffeLightSettings) { originalSettings = value },
     advance(dt: number) { orbit = (orbit + dt * Math.PI * 2 / 15) % (Math.PI * 2) },

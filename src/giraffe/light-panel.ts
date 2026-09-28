@@ -6,6 +6,7 @@ const lamps = ['Principal', 'Contraluz', 'Relleno', 'Trasera', 'Extra cálida', 
 const labels: Record<Q2LampParameter, string> = {
   power: 'Potencia', x: 'Posición X', y: 'Posición Y', z: 'Posición Z',
   rotationX: 'Inclinación', rotationY: 'Dirección', rotationZ: 'Giro del panel',
+  temperature: 'Temperatura', shadowStrength: 'Intensidad de sombras', shadowSoftness: 'Filtro de sombras', shadowBias: 'Sesgo de sombras', normalBias: 'Sesgo de normales', shadowResolution: 'Resolución de sombras', distance: 'Distancia de corte', decay: 'Caída de intensidad',
   angle: 'Apertura del foco', softness: 'Difusión del borde', width: 'Ancho', height: 'Alto',
 }
 export function giraffeLightMarkup() {
@@ -38,6 +39,7 @@ export function bindGiraffeLight(onChange: (settings: GiraffeLightSettings) => v
   function renderLamp() {
     const lamp = state.lamps[selected]
     const lampField = (key: Q2LampParameter, unit = '') => {
+      if (key === 'shadowResolution') return `<label class="inspector-select">Resolución de sombras<select id="giraffe-lamp-shadowResolution">${[512, 1024, 2048, 4096].map(size => `<option value="${size}" ${size === lamp.shadowResolution ? 'selected' : ''}>${size} px</option>`).join('')}</select></label>`
       const [min, max, step] = Q2_LAMP_RANGES[key]
       return field(`giraffe-lamp-${key}`, labels[key], lamp[key], min, key === 'power' ? Q2_LAMP_POWER_MAX[lamp.type] : max, step, unit)
     }
@@ -45,10 +47,14 @@ export function bindGiraffeLight(onChange: (settings: GiraffeLightSettings) => v
       <div class="light-source-top"><label class="light-toggle"><input id="giraffe-lamp-enabled" type="checkbox" ${lamp.enabled ? 'checked' : ''}>Encendida</label><label class="light-color">Color<input id="giraffe-lamp-color" type="color" value="${lamp.color}" aria-label="Color de la luz Giraffe"></label></div>
       <label class="inspector-select">Tipo de luz<select id="giraffe-lamp-type">${Object.entries({ sun: 'Sol', point: 'Puntual', spot: 'Foco', area: 'Panel de área' }).map(([key, label]) => `<option value="${key}" ${lamp.type === key ? 'selected' : ''}>${label}</option>`).join('')}</select></label>
       ${lampField('power')}
+      <label class="light-toggle"><input id="giraffe-lamp-temperature-on" type="checkbox" ${lamp.useTemperature ? 'checked' : ''}>Usar temperatura de color</label>
+      ${lamp.useTemperature ? lampField('temperature', 'K') : ''}
+      ${lamp.type === 'point' || lamp.type === 'spot' ? `<details class="light-section"><summary>Alcance y caída</summary><div class="light-section-body">${lampField('distance')}${lampField('decay')}</div></details>` : ''}
       ${lamp.type === 'spot' ? lampField('angle', '°') + lampField('softness', '%') : ''}
       ${lamp.type === 'area' ? lampField('width') + lampField('height') : ''}
       ${lamp.type !== 'point' ? `<details class="light-section" open><summary>Orientación</summary><div class="light-section-body">${lamp.type === 'sun' ? '<p class="light-note">En una luz de sol, la dirección se ajusta con la orientación.</p>' : ''}${lampField('rotationX', '°')}${lampField('rotationY', '°')}${lamp.type === 'area' ? lampField('rotationZ', '°') : ''}</div></details>` : ''}
       <details class="light-section" ${lamp.type !== 'sun' ? 'open' : ''}><summary>Posición</summary><div class="light-section-body">${lampField('x')}${lampField('y')}${lampField('z')}</div></details>
+      ${lamp.type !== 'area' ? `<details class="light-section"><summary>Sombras</summary><div class="light-section-body"><label class="light-toggle"><input id="giraffe-lamp-shadows" type="checkbox" ${lamp.shadows ? 'checked' : ''}>Proyectar sombras</label>${lampField('shadowStrength')}${lampField('shadowSoftness')}${lampField('shadowBias')}${lampField('normalBias')}${lampField('shadowResolution', 'px')}</div></details>` : '<p class="light-note">La luz de área ilumina la superficie; no proyecta sombra directa en este visor.</p>'}
       <button class="inspector-reset" id="giraffe-lamp-reset" type="button">Restablecer esta luz</button>
     </div>`
     editor.querySelectorAll<HTMLInputElement>('[disabled]').forEach(el => { el.disabled = false })
@@ -59,6 +65,9 @@ export function bindGiraffeLight(onChange: (settings: GiraffeLightSettings) => v
     })
     editor.querySelector<HTMLInputElement>('#giraffe-lamp-enabled')!.addEventListener('change', event => { state.lamps[selected].enabled = (event.target as HTMLInputElement).checked; emit() })
     editor.querySelector<HTMLInputElement>('#giraffe-lamp-color')!.addEventListener('input', event => { state.lamps[selected].color = (event.target as HTMLInputElement).value; emit() })
+    editor.querySelector('#giraffe-lamp-temperature-on')!.addEventListener('change', event => { state.lamps[selected].useTemperature = (event.target as HTMLInputElement).checked; renderLamp(); sync() })
+    editor.querySelector('#giraffe-lamp-shadows')?.addEventListener('change', event => { state.lamps[selected].shadows = (event.target as HTMLInputElement).checked; emit() })
+    editor.querySelector('#giraffe-lamp-shadowResolution')?.addEventListener('change', event => { state.lamps[selected].shadowResolution = Number((event.target as HTMLSelectElement).value); emit() })
     editor.querySelector('#giraffe-lamp-reset')!.addEventListener('click', () => { state.lamps[selected] = q2LampDefaults()[selected]; renderLamp(); sync() })
   }
   bindFields(root.querySelector<HTMLElement>('#giraffe-world')!, (id, value) => { state[id.replace('giraffe-', '') as keyof typeof worldRanges] = value; sync() })

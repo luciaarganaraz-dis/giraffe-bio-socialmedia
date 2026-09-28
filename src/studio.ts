@@ -1,8 +1,7 @@
 import {
-  AgXToneMapping, ACESFilmicToneMapping, Box3, Color, Group,
-  OrthographicCamera, PCFShadowMap, PMREMGenerator, Scene, Vector2, Vector3, WebGLRenderer,
+  AgXToneMapping, ACESFilmicToneMapping, Group,
+  PCFShadowMap, PMREMGenerator, Scene, Vector3, WebGLRenderer,
 } from 'three'
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { createLogo, disposeLogo, readLogo, type Piece } from './logo'
 import { applyFinish, createMaterials, type Finish } from './materials'
@@ -13,8 +12,15 @@ import { createLighting, type LightSettings } from './lighting'
 import { createSculpture } from './sculpture/model'
 import { createSculptureSurface } from './sculpture/surface'
 import { createSculptureBackground } from './sculpture/background'
-import { createTextureController, textureDefaults, type TextureSettings } from './giraffe/texture'
-import { SCULPTURE_LOOK } from './sculpture/surface'
+import { type TextureSettings } from './giraffe/texture'
+import { createCamera } from './parameters/camera'
+import { createSurfaceControls } from './parameters/surface'
+import type { MaterialSettings } from './parameters/material'
+import type { DetailSettings } from './parameters/texture-detail'
+import { RENDER_DEFAULTS, OBJECT_DEFAULTS, type RenderSettings, type ObjectSettings, type CameraSettings } from './parameters/scene-settings'
+import { applyRender } from './parameters/render'
+import { captureImage } from './parameters/capture'
+import { framingBounds } from './parameters/framing'
 import type { GiraffeLightSettings } from './giraffe/settings'
 
 export async function createStudio(host: HTMLElement) {
@@ -31,7 +37,9 @@ export async function createStudio(host: HTMLElement) {
   renderer.domElement.setAttribute('aria-hidden', 'true')
 
   const scene = new Scene()
-  const camera = new OrthographicCamera(-8, 8, 5, -5, 0.1, 100)
+  let dirty = true
+  const view = createCamera(renderer.domElement, () => { dirty = true })
+  const controls = view.controls
   const environment = new RoomEnvironment()
   const pmrem = new PMREMGenerator(renderer)
   const environmentMap = pmrem.fromScene(environment, 0.04)
@@ -48,9 +56,8 @@ export async function createStudio(host: HTMLElement) {
   scene.add(backdrop.mesh)
   const sculptureSurface = createSculptureSurface(stone.uniforms)
   const sculptureBackground = createSculptureBackground()
-  const sculptureTexture = createTextureController(sculptureSurface.material, sculptureSurface.uniforms, SCULPTURE_LOOK)
-  const stoneTexture = createTextureController(stone.material, stone.uniforms, LOOK)
-  let textureSettings = textureDefaults()
+  const surface = createSurfaceControls(stone, sculptureSurface)
+  let renderSettings = { ...RENDER_DEFAULTS }, objectSettings = { ...OBJECT_DEFAULTS }
   scene.add(sculptureBackground.mesh)
   let transparentCapture = false
   let finish: Finish = 'graphite'
@@ -60,14 +67,9 @@ export async function createStudio(host: HTMLElement) {
   let model = makeModel()
   const pivot = new Group()
   pivot.add(model)
-  scene.add(pivot)
-  const controls = new OrbitControls(camera, renderer.domElement)
-  controls.enablePan = false
-  controls.enableDamping = true
-  controls.dampingFactor = 0.08
-  controls.minZoom = 0.65
-  controls.maxZoom = 2.5
-  controls.rotateSpeed = 0.65
+  const objectRoot = new Group()
+  objectRoot.add(pivot); scene.add(objectRoot)
+
   // The canvas rotates with a finger; the page scrolls from the surrounding UI.
   renderer.domElement.style.touchAction = 'none'
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -77,29 +79,25 @@ export async function createStudio(host: HTMLElement) {
   let lastTime = 0
   let phase = 0
   let visible = true
-  let dirty = true
   controls.addEventListener('change', () => { dirty = true })
   let onMotionChange = (_moving: boolean) => {}
 
   function fit(width: number, height: number) {
-    const bounds = new Box3().setFromObject(model)
+    const bounds = framingBounds(model, pivot)
     const size = bounds.getSize(new Vector3())
     const aspect = width / height
     const halfHeight = piece === 'sculpture'
       ? Math.max(size.y * .57, size.x / aspect * .62)
       : Math.max(size.y * .95, size.x / aspect * .62)
-    camera.left = -halfHeight * aspect
-    camera.right = halfHeight * aspect
-    camera.top = halfHeight
-    camera.bottom = -halfHeight
-    camera.updateProjectionMatrix()
+    view.fit(width, height, halfHeight)
   }
   function render() {
-    lighting.update(camera)
+    lighting.update(view.camera)
+    applyRender(renderer, scene, renderSettings)
     backdrop.mesh.visible = !transparentCapture && piece !== 'sculpture'
     sculptureBackground.mesh.visible = !transparentCapture && piece === 'sculpture'
-    if (backdrop.mesh.visible) backdrop.update(camera, pivot)
-    renderer.render(scene, camera)
+    if (backdrop.mesh.visible) backdrop.update(view.camera, pivot)
+    renderer.render(scene, view.camera)
   }
   function resize() {
     const { width, height } = host.getBoundingClientRect()
@@ -109,9 +107,7 @@ export async function createStudio(host: HTMLElement) {
     render()
   }
   function reset() {
-    camera.position.set(0, 0, 20)
-    camera.zoom = 1
-    controls.target.set(0, 0, 0)
+    view.reset()
     if (piece === 'sculpture') pivot.rotation.set(.035, -.62, .11)
     else pivot.rotation.set(.24, -.35, -.025)
     pivot.position.y = 0
@@ -159,6 +155,24 @@ export async function createStudio(host: HTMLElement) {
     get model() { return model },
     get piece() { return piece },
     get finish() { return finish },
+    get settings() { return { surface: surface.state, camera: view.settings, object: objectSettings, render: renderSettings, light: lighting.settings, giraffeLight: lighting.originalSettings, mode: host.dataset.lightingMode, piece, depth } },
+    set onCameraChange(callback: (s: CameraSettings) => void) { view.onChange = callback },
+    setCamera(settings: CameraSettings) { view.apply(settings); host.dataset.camera = JSON.stringify(view.settings); render() },
+    setObject(settings: ObjectSettings) {
+      objectSettings = settings
+      objectRoot.position.set(settings.x, settings.y, settings.z)
+      objectRoot.rotation.set(settings.rotationX * Math.PI / 180, settings.rotationY * Math.PI / 180, settings.rotationZ * Math.PI / 180)
+      objectRoot.scale.set(settings.scaleX, settings.scaleY, settings.scaleZ)
+      host.dataset.object = JSON.stringify(settings); render()
+    },
+    setRender(settings: RenderSettings) {
+      renderSettings = settings
+      sculptureBackground.set(settings.backgroundTop, settings.backgroundBottom, settings.backgroundGrain)
+      renderer.setPixelRatio(settings.quality)
+      host.dataset.render = JSON.stringify(settings); resize()
+    },
+    setMaterial(settings: MaterialSettings) { surface.material(settings); host.dataset.material = JSON.stringify(settings); measureModel(); render() },
+    setDetail(settings: DetailSettings) { surface.detail(settings); host.dataset.detail = JSON.stringify(settings); measureModel(); render() },
     set onMotionChange(callback: (value: boolean) => void) { onMotionChange = callback },
     setMotion,
     reset,
@@ -176,10 +190,9 @@ export async function createStudio(host: HTMLElement) {
       lighting.setMode(mode); host.dataset.lightingMode = mode; render()
     },
     setTexture(settings: TextureSettings) {
-      textureSettings = settings
-      sculptureTexture(settings); stoneTexture(settings)
+      surface.texture(settings)
       host.dataset.texture = JSON.stringify(settings)
-      model.userData.texture = { ...settings }
+      measureModel()
       render()
     },
     key(event: KeyboardEvent) {
@@ -194,8 +207,7 @@ export async function createStudio(host: HTMLElement) {
         pivot.rotation.y += y
       } else if (['+', '=', '-'].includes(event.key)) {
         event.preventDefault()
-        camera.zoom = Math.min(2.5, Math.max(0.65, camera.zoom * (event.key === '-' ? 0.9 : 1.1)))
-        camera.updateProjectionMatrix()
+        view.zoom(event.key === '-' ? .9 : 1.1)
       } else if (event.key === 'Home') { event.preventDefault(); reset() }
       else return
       render()
@@ -209,38 +221,18 @@ export async function createStudio(host: HTMLElement) {
       rebuild()
     },
     async exportModel() {
+      const exported = model.clone(true)
+      exported.position.copy(objectRoot.position); exported.rotation.copy(objectRoot.rotation); exported.scale.copy(objectRoot.scale)
+      exported.userData.camera = view.settings; exported.userData.render = renderSettings
       if (piece === 'sculpture') {
         const { exportSculpture } = await import('./sculpture/export')
-        return exportSculpture(model, renderer, sculptureSurface.uniforms, sculptureSurface.material)
+        return exportSculpture(exported, renderer, sculptureSurface.uniforms, sculptureSurface.material)
       }
       const { exportLogo } = await import('./stone/export')
-      return exportLogo(model, finish === 'stone' ? { renderer, uniforms: stone.uniforms, finish: stone.material } : undefined)
+      return exportLogo(exported, finish === 'stone' ? { renderer, uniforms: stone.uniforms, finish: stone.material } : undefined)
     },
-    async capture(transparent: boolean) {
-      const originalSize = renderer.getSize(new Vector2())
-      const originalRatio = renderer.getPixelRatio()
-      const originalBackground = scene.background
-      const originalTransparent = transparentCapture
-      try {
-        renderer.setPixelRatio(1)
-        const width = piece === 'sculpture' ? 2160 : piece === 'symbol' ? 2048 : 3000
-        const height = piece === 'sculpture' ? 2700 : piece === 'symbol' ? 2048 : 1500
-        renderer.setSize(width, height, false)
-        fit(width, height)
-        transparentCapture = transparent
-        scene.background = transparent ? null : new Color('#111316')
-        render()
-        return await new Promise<Blob>((resolve, reject) => renderer.domElement.toBlob(blob => {
-          if (blob) resolve(blob)
-          else reject(new Error('No se pudo exportar la imagen.'))
-        }, 'image/png'))
-      } finally {
-        scene.background = originalBackground
-        transparentCapture = originalTransparent
-        renderer.setPixelRatio(originalRatio)
-        renderer.setSize(originalSize.x, originalSize.y, false)
-        resize()
-      }
+    capture(transparent: boolean) {
+      return captureImage(renderer, scene, piece, renderSettings, transparent, value => { transparentCapture = value }, fit, render, resize)
     },
     dispose() {
       cancelAnimationFrame(frame)
@@ -273,7 +265,7 @@ export async function createStudio(host: HTMLElement) {
   }
 
   function measureModel() {
-    model.userData.texture = { ...textureSettings }
+    Object.assign(model.userData, surface.state)
     host.dataset.piece = piece
     host.dataset.meshes = String(model.children.length)
     host.dataset.carved = String(model.userData.carved)

@@ -28,6 +28,8 @@ export function createTextureController(material: MeshStandardMaterial, uniforms
   return (settings: TextureSettings) => {
     const base = settings.preset === 'original-004-v2' ? LOOK : specimen
     applyLook(base, uniforms)
+    uniforms.uTriBlend.value = 4
+    uniforms.uPyriteRough.value = .3
     uniforms.uTriScale.value = base.scale * settings.scale / 100
     uniforms.uTriNormal.value = base.relief * settings.relief / 100
     uniforms.uGrainRelief.value = base.grainRelief * settings.relief / 100

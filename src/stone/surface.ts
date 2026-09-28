@@ -32,7 +32,7 @@ export async function createStoneSurface(renderer: THREE.WebGLRenderer) {
   uniforms.uTriNor.value = normal
   uniforms.uTriArm.value = arm
   applyLook(LOOK, uniforms)
-  const material = new THREE.MeshStandardMaterial({
+  const material = new THREE.MeshPhysicalMaterial({
     name: 'Giraffe Bio — piedra gris erosionada',
     color: 'white', roughness: LOOK.roughness, metalness: LOOK.metalness,
   })

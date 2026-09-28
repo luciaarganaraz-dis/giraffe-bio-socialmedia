@@ -13,12 +13,17 @@ export type Q2LampSettings = {
   softness: number
   width: number
   height: number
+  temperature: number; useTemperature: boolean; shadows: boolean
+  shadowStrength: number; shadowSoftness: number; shadowBias: number; normalBias: number
+  shadowResolution: number; distance: number; decay: number
 }
-export type Q2LampParameter = Exclude<keyof Q2LampSettings, 'type' | 'enabled' | 'color'>
+export type Q2LampParameter = Exclude<keyof Q2LampSettings, 'type' | 'enabled' | 'color' | 'useTemperature' | 'shadows'>
 export const Q2_LAMP_TYPES: Q2LampType[] = ['sun', 'point', 'spot', 'area']
 export const Q2_LAMP_POWER_MAX = { sun: 50, point: 5000, spot: 5000, area: 500 }
 export const Q2_LAMP_RANGES: Record<Q2LampParameter, readonly [number, number, number]> = {
-  power: [0, 5000, 0.01],
+  power: [0, 5000, 0.01], temperature: [1000, 12000, 50],
+  shadowStrength: [0, 1, .01], shadowSoftness: [0, 8, .1], shadowBias: [-.005, .005, .0001], normalBias: [0, .05, .001],
+  shadowResolution: [512, 4096, 512], distance: [0, 100, .1], decay: [0, 3, .1],
   x: [-12, 12, 0.01], y: [-12, 12, 0.01], z: [-12, 12, 0.01],
   rotationX: [-180, 180, 0.01], rotationY: [-180, 180, 0.01], rotationZ: [-180, 180, 0.01],
   angle: [5, 160, 1], softness: [0, 100, 1],
@@ -30,8 +35,10 @@ export function q2LampDefaults(): Q2LampSettings[] {
   return [
     ...Object.entries(LOOK.lights).map(([id, spec]) => ({ i: strengths[id], ...spec })),
     ...LOOK.extraLights,
-  ].map((spec) => ({
+  ].map((spec, index) => ({
     type: 'sun', enabled: true, color: spec.color, power: spec.i ?? 1,
+    temperature: 6500, useTemperature: false, shadows: index === 0,
+    shadowStrength: 1, shadowSoftness: 1, shadowBias: -.0001, normalBias: .002, shadowResolution: 2048, distance: 0, decay: 2,
     x: spec.x, y: spec.y, z: spec.z,
     // YXZ Euler angles: every original lamp starts aimed at the stone's centre.
     rotationX: Math.atan2(-spec.y, Math.hypot(spec.x, spec.z)) * 180 / Math.PI,
@@ -55,7 +62,7 @@ export function readQ2Lamps(saved: unknown): Q2LampSettings[] {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return base
     const result = { ...base }
     if (Q2_LAMP_TYPES.includes(value.type)) result.type = value.type
-    if (typeof value.enabled === 'boolean') result.enabled = value.enabled
+    for (const key of ['enabled', 'shadows', 'useTemperature'] as const) if (typeof value[key] === 'boolean') result[key] = value[key]
     if (typeof value.color === 'string' && /^#[\da-f]{6}$/i.test(value.color)) result.color = value.color
     for (const key of Object.keys(Q2_LAMP_RANGES) as Q2LampParameter[]) {
       const [min, max] = Q2_LAMP_RANGES[key]
@@ -63,6 +70,7 @@ export function readQ2Lamps(saved: unknown): Q2LampSettings[] {
       if (typeof n === 'number' && Number.isFinite(n) && n >= min && n <= max) result[key] = n
     }
     result.power = Math.min(result.power, Q2_LAMP_POWER_MAX[result.type])
+    result.shadowResolution = 2 ** Math.round(Math.log2(result.shadowResolution))
     return result
   })
 }

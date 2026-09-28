@@ -18,7 +18,8 @@ export function bindFields(root: HTMLElement, onChange: (id: string, value: numb
 }
 export function syncField(root: HTMLElement, id: string, value: number) {
   root.querySelectorAll<HTMLInputElement>(`[data-field="${id}"]`).forEach(input => {
-    if (input !== document.activeElement) input.value = String(Number(value.toFixed(3)))
+    const precision = Math.max(3, (input.step.split('.')[1] ?? '').length)
+    if (input !== document.activeElement) input.value = String(Number(value.toFixed(precision)))
   })
 }
 export function readStorage(key: string): unknown {

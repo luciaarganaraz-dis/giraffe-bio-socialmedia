@@ -17,3 +17,11 @@
 .scene-workspace[data-composition='sculpture'] .workbench { height: max(512px, min(calc(70svh + 2px), 702px)); }
 .scene-workspace:not([data-composition='sculpture']) .workbench { max-height: 820px; }
 @media (max-width: 680px) { .workbench { border-left: 1px solid var(--rule); border-top: 0; } }
+
+.workbench-tabs { display: grid; grid-template-columns: repeat(3, 1fr); }
+.workbench-tabs button { padding: 9px 5px; font-size: 11px; }
+.workbench-tabs button:last-child { grid-column: 1 / -1; }
+.parameter-color { justify-content: space-between; }
+.parameter-export { flex: 0 0 auto; padding: 10px 20px; border-top: 1px solid var(--rule); }
+.parameter-export button { width: 100%; padding: 7px; border: 1px solid var(--rule); background: transparent; font-size: 10px; }
+.parameter-export small { display: block; font-size: 9px; color: var(--muted); margin-top: 7px; line-height: 1.4; }

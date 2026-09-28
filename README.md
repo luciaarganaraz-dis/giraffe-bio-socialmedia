@@ -16,7 +16,7 @@ Abrir **http://127.0.0.1:5187**. El servidor usa un puerto fijo y sólo escucha 
 ## Usar
 
 - Arrastrar el logo para girarlo; rueda o gesto de dos dedos para acercar.
-- Alternar entre Escultura (vista inicial), el logo completo y las cinco piezas del isotipo. La escultura integra un solo símbolo, con partes hundidas y salientes en la misma roca oscura.
+- Alternar entre Escultura (vista inicial), el logo completo y las cinco piezas del isotipo. La escultura integra un solo símbolo, con las cinco formas hundidas en la misma roca oscura.
 - Ajustar la profundidad para acentuar el vaciado y el relieve. En Logo completo e Isotipo también se puede elegir piedra, grafito, cobre o marfil; la escultura mantiene un único material de roca.
 - Pausar el movimiento y restablecer la vista.
 - Trabajar la luz en el panel «Luz del estudio»: elegir Principal, Relleno, Contraluz o Foco de acento para ajustar cada fuente. El punto arrastrable mueve la principal; también responde a las flechas del teclado.
@@ -25,7 +25,7 @@ Abrir **http://127.0.0.1:5187**. El servidor usa un puerto fijo y sólo escucha 
 - Probar Referencia, Suave, Contraste o Cálida/fría. «Guardar mi luz» guarda una configuración en este navegador; «Recuperar» la restaura incluso después de cerrar y volver a abrir la página.
 - «Restablecer luz» recupera los valores iniciales sin cambiar el encuadre. Los ajustes se conservan al cambiar de material o pieza.
 - Descargar PNG: 2160 × 2700 para la escultura (4:5), 3000 × 1500 para el logo o 2048 × 2048 para el isotipo. Conserva el fondo y la iluminación elegida; transparencia opcional.
-- Descargar GLB: geometría y materiales, para abrir en Blender u otra herramienta 3D. El GLB de piedra incorpora mapas de color, relieve y rugosidad/metallicidad horneados a 2048 px desde el acabado de piedra gris. El grano fino puede verse más suave que en el shader vivo. El GLB contiene la pieza centrada; no incorpora el fondo, la cámara ni la iluminación del estudio.
+- Descargar GLB: geometría y materiales, para abrir en Blender u otra herramienta 3D. El GLB de piedra incorpora mapas de color, relieve y rugosidad/metallicidad horneados a 2048 px desde el acabado de piedra gris. El grano fino puede verse más suave que en el shader vivo. El GLB conserva las transformaciones del panel Objeto y el material editado; no incorpora el fondo ni luces o cámaras activas del estudio.
 - Con el visor enfocado: flechas para girar, `+` / `−` para acercar y `Home` para restablecer.
 
 El movimiento automático se desactiva al manipular la pieza. Se respeta la preferencia de movimiento reducido del sistema. El símbolo y las letras parten de los trazados del SVG original, sin sustituir la tipografía. En piedra, el contorno y las superficies se erosionan de forma determinista; la silueta general y los huecos siguen reconocibles.
@@ -111,3 +111,21 @@ En Textura se elige **Piedra tallada actual** o **Giraffe · Original 004_v2**. 
 El PNG incluye el material editado y la iluminación. El GLB conserva la geometría y hornea los valores reales de rugosidad y metal, además de los uniformes de textura; no incluye la iluminación del estudio. `exports/giraffe-bio-original-004-v2.png` es una muestra con los valores originales.
 
 `pnpm check:giraffe` comprueba cambios de píxeles para los nueve controles de textura, las seis luces y sus cuatro tipos, ambiente, exposición y foco. También comprueba independencia de luz y material, guardado tras recargar y que cambiar rugosidad modifique sólo el mapa correspondiente del GLB.
+
+
+## Inspector ampliado — controles compatibles con Blender
+
+Siete pestañas junto al visor: **Luz, Textura, Material, Cámara, Objeto, Render y Textura avanzada**. Los controles actúan en tiempo real, tienen valores numéricos, restablecimiento por panel y guardado automático en este navegador. El esquema anterior de cuatro luces mantiene su guardado manual.
+
+- **Luz:** las seis luces Giraffe suman temperatura de color (1000–12000 K), sombras por fuente, intensidad, filtro, sesgo, sesgo de normales y resolución de 512 a 4096 px. Puntual y Foco suman distancia de corte y caída. Área conserva ancho, alto y giro; no proyecta sombra directa en este visor.
+- **Material de piedra:** tinte base, rugosidad, metal, IOR, especular, anisotropía, recubrimiento, brillo superficial, transmisión, espesor y absorción, película fina, emisión, alfa y doble cara. La rugosidad y el metal propios se habilitan con su casilla; al restablecer se recuperan los valores de la piedra.
+- **Textura avanzada:** capa opcional sobre la base actual con paleta mineral, vetas, grano, mezcla entre caras, oclusión, pirita, inclusiones, forma del depósito dorado y marcas direccionales de relieve. Comienza apagada para conservar el aspecto elegido. Los controles de oro necesitan activar oro o motas en Textura para hacerse visibles en la piedra.
+- **Cámara:** perspectiva u ortográfica, focal y sensor en perspectiva, zoom, desplazamiento de encuadre, distancia, giro, elevación, rotación, punto de mira y planos de recorte. Arrastrar el visor actualiza los valores; escribirlos detiene la inercia previa.
+- **Objeto:** ubicación, rotación y escala por eje. El escalado se mantiene al redimensionar o descargar; no se compensa automáticamente con la cámara.
+- **Render:** AgX, ACES Filmic, Neutral, Reinhard o Lineal; exposición en EV, fuerza del entorno, fondo de estudio y grano, calidad del visor, formatos para redes y tamaño PNG personalizado hasta 4096 px por lado. Los colores del fondo se usan en Escultura. Cambiar la proporción de salida reencuadra la pieza conservando ángulo y zoom.
+
+**Descargar ajustes .json** guarda una descripción de la escena con los controles de los paneles, luz, pieza y profundidad. Es una copia de los valores, no un archivo `.blend` ni un importador de escenas. El PNG conserva la apariencia; el GLB hornea la piedra a mapas e incluye los acabados físicos admitidos por glTF, además de las transformaciones del objeto. Cámara y render se guardan como metadatos del GLB, no como una cámara o un motor de render activo.
+
+Este inspector usa el motor en tiempo real de Three.js. Los nombres de material se corresponden con conceptos de Principled; sus valores y resultados no son idénticos a Blender. No implementa Cycles, editor de nodos, dispersión subsuperficial, profundidad de campo, compositing ni todos los paneles de Blender. No hay controles simulados para esas funciones.
+
+`src/parameters/` contiene los paneles y la aplicación de estos ajustes. `pnpm check:parameters` comprueba cambios de píxeles, cámaras, exportación PNG personalizada, extensiones físicas y transformaciones del GLB, JSON y persistencia. Se complementa con `check:giraffe` y `check:sculpture`.

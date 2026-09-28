@@ -1,5 +1,6 @@
 // Adapted from Giraffe bio, revision 002f979.
 import * as THREE from 'three'
+import { temperatureColor } from '../parameters/light-temperature'
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js'
 import { q2LampDefaults, type Q2LampSettings, type Q2LampType } from './lamp-settings'
 
@@ -39,15 +40,8 @@ export function createQ2StudioLighting() {
           entry.light.dispose()
         }
         entry = { type: spec.type, light: createLight(spec.type) }
-        // The carved solid needs self-shadowing from the principal lamp.
-        if (index === 0 && 'shadow' in entry.light) {
-          entry.light.castShadow = true
-          entry.light.shadow.mapSize.set(2048, 2048)
-          entry.light.shadow.bias = -.0001
-          entry.light.shadow.normalBias = .002
-          if (entry.light instanceof THREE.DirectionalLight) {
-            Object.assign(entry.light.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: .1, far: 40 })
-          }
+        if (entry.light instanceof THREE.DirectionalLight) {
+          Object.assign(entry.light.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: .1, far: 60 })
         }
         entries[index] = entry
         group.add(entry.light)
@@ -56,6 +50,20 @@ export function createQ2StudioLighting() {
       const light = entry.light
       light.visible = spec.enabled
       light.color.set(spec.color)
+      if (spec.useTemperature) light.color.multiply(temperatureColor(spec.temperature))
+      if ('distance' in light) { light.distance = spec.distance; light.decay = spec.decay }
+      if ('shadow' in light) {
+        light.castShadow = spec.shadows
+        light.shadow.intensity = spec.shadowStrength
+        light.shadow.radius = spec.shadowSoftness
+        light.shadow.bias = spec.shadowBias
+        light.shadow.normalBias = spec.normalBias
+        const resolution = 2 ** Math.round(Math.log2(spec.shadowResolution))
+        if (light.shadow.mapSize.x !== resolution) {
+          light.shadow.mapSize.set(resolution, resolution)
+          light.shadow.map?.dispose(); light.shadow.map = null
+        }
+      }
       light.intensity = spec.power * intensity / 100
       light.position.set(spec.x, spec.y, spec.z)
       rotation.set(THREE.MathUtils.degToRad(spec.rotationX), THREE.MathUtils.degToRad(spec.rotationY), THREE.MathUtils.degToRad(spec.rotationZ), 'YXZ')
