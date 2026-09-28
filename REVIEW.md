@@ -70,3 +70,12 @@ El GLB incluye la geometría y sus materiales; la iluminación, la cámara y el 
 - Las profundidades 24, 78 y 130 conservan tres vaciados y dos relieves. Una malla, un material y tres mapas PBR. PNG y GLB actualizados; este último pesa aproximadamente 12.5 MB.
 - `pnpm check:sculpture`, `pnpm check` y `pnpm build` correctos. Controles de luz, transparencia y exportación comprobados, sin errores de consola.
 - Movimiento conservado: giro lento con flotación sutil.
+
+## Panel de luz completo — 28 de septiembre de 2026
+
+- 38 ajustes: cuatro luces independientes, posiciones en tres ejes, color, intensidad, encendido y sombras por luz. Foco con apertura, difusión y punto de enfoque. Ambiente, giro del entorno, exposición, intensidad y suavidad de sombras; luces fijas o relativas a la cámara.
+- Cuatro combinaciones de partida y guardado local de una configuración. Deslizadores, valores numéricos exactos y punto arrastrable para la principal. Panel con accesos directos y desplazamiento propio; controles inspeccionados en el navegador local.
+- Medidas sobre píxeles renderizados confirman cambios de cada fuente aislada, color, posición, apertura/difusión/enfoque, sombras por luz y suavidad. La diferencia media con/sin suavidad es 0.408 sobre 255; con luces fijas o relativas a cámara tras girarla, 6.837. Detalle en `.review/light-studio-report.json`.
+- Guardar, restablecer, recuperar y recargar comprobados. La entrada numérica permite escribir valores completos y limita los valores fuera de rango. PNG con luz cálida/fría y PNG transparente verificados, sin alterar los ajustes del visor.
+- `pnpm check:light-studio`, `pnpm check:lighting`, `pnpm check:sculpture`, `pnpm check` y `pnpm build` correctos; sin errores de consola. La geometría y el GLB permanecen iguales. Las luces pertenecen al estudio y al PNG.
+- Movimiento conservado: giro lento con flotación sutil.

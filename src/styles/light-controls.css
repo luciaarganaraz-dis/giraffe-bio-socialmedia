@@ -1,21 +1,48 @@
-.light-panel { padding: 22px 24px 24px; border: 1px solid var(--rule); border-top: 0; background: var(--paper); }
-.light-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 18px; }
+.light-panel { display: flex; flex-direction: column; min-height: 0; padding: 20px; border: 1px solid var(--rule); background: var(--paper); }
+.light-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .light-heading .eyebrow { font-size: 9px; }
-.light-heading p { margin: 6px 0 0; font-size: 13px; }
-.light-heading button { border: 0; background: none; padding: 8px 0 8px 12px; font-size: 11px; color: var(--muted); }
-.light-body { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 36px; align-items: center; }
-.light-position-control { display: flex; align-items: center; gap: 16px; }
-.light-position-caption { display: grid; gap: 8px; font-size: 12px; }
+.light-heading p { margin: 6px 0 16px; font-size: 13px; line-height: 1.5; }
+.light-heading button { border: 0; background: none; padding: 0; font-size: 10px; color: var(--muted); white-space: nowrap; }
+.light-presets { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.light-presets button, .light-memory button { border: 1px solid var(--rule); background: transparent; padding: 8px; font-size: 11px; }
+.light-presets button[aria-pressed='true'] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.light-current { font-size: 10px; color: var(--muted); margin: 10px 0 16px; }
+.light-nav { display: flex; flex-wrap: wrap; gap: 5px; padding-bottom: 13px; }
+.light-nav button { background: var(--stage); border: 0; padding: 6px 8px; font-size: 10px; }
+.light-nav button:hover { background: var(--rule); }
+.light-scroll { min-height: 0; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--rule) transparent; overscroll-behavior: contain; padding-right: 8px; }
+.light-section { border-top: 1px solid var(--rule); }
+.light-section:last-child { border-bottom: 1px solid var(--rule); }
+.light-section summary { display: flex; align-items: center; gap: 9px; padding: 16px 0; cursor: pointer; font-size: 12px; list-style: none; }
+.light-section summary::-webkit-details-marker { display: none; }
+.light-section summary::after { content: '+'; margin-left: auto; font-size: 15px; color: var(--muted); }
+.light-section[open] summary::after { content: '−'; }
+.light-section summary small { color: var(--muted); font-size: 10px; margin-left: auto; }
+.light-section summary small + :last-child { margin-left: 0; }
+.light-summary-dot { width: 10px; height: 10px; border: 1px solid var(--rule); border-radius: 50%; flex-shrink: 0; }
+.light-section-body { display: grid; gap: 13px; padding-bottom: 20px; }
+.light-note { margin: -2px 0 2px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.light-source-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.light-toggle, .light-color { display: flex; align-items: center; gap: 7px; font-size: 11px; cursor: pointer; }
+.light-toggle input { accent-color: var(--accent); margin: 0; width: 14px; height: 14px; }
+.light-color input { width: 30px; height: 25px; padding: 2px; border: 1px solid var(--rule); background: transparent; cursor: pointer; }
+.light-slider { display: grid; gap: 3px; }
+.light-slider-label { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 11px; }
+.light-value { display: flex; align-items: center; gap: 4px; color: var(--muted); }
+.light-value input { width: 43px; padding: 3px 2px; border: 0; border-bottom: 1px solid var(--rule); background: transparent; color: var(--ink); font-size: 11px; text-align: right; font-variant-numeric: tabular-nums; appearance: textfield; }
+.light-value input::-webkit-inner-spin-button, .light-value input::-webkit-outer-spin-button { appearance: none; margin: 0; }
+.light-value small { width: 9px; font-size: 10px; }
+.light-slider input[type='range'] { margin: 0; height: 20px; }
+.light-scroll > .light-slider { padding-bottom: 13px; }
+.light-position-control { display: flex; align-items: center; gap: 12px; margin: 3px 0; }
+.light-position-caption { display: grid; gap: 7px; font-size: 11px; }
 .light-position-caption small { font-size: 10px; color: var(--muted); }
-.light-pad { --light-x: 90%; --light-y: 27.5%; position: relative; width: 104px; height: 104px; flex-shrink: 0; overflow: hidden; border: 1px solid var(--rule); background: var(--stage); touch-action: none; cursor: crosshair; }
+.light-pad { --light-x: 90%; --light-y: 27.5%; position: relative; width: 86px; height: 86px; flex-shrink: 0; overflow: hidden; border: 1px solid var(--rule); background: var(--stage); touch-action: none; cursor: crosshair; }
 .light-pad::before, .light-pad::after { content: ''; position: absolute; background: var(--rule); pointer-events: none; }
 .light-pad::before { top: 50%; left: 0; width: 100%; height: 1px; }
 .light-pad::after { left: 50%; top: 0; height: 100%; width: 1px; }
 .light-orbit { position: absolute; inset: 18%; border: 1px solid var(--rule); border-radius: 50%; }
 .light-point { position: absolute; z-index: 1; left: clamp(7px, var(--light-x), calc(100% - 7px)); top: clamp(7px, var(--light-y), calc(100% - 7px)); width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent), transparent 85%); transform: translate(-50%, -50%); pointer-events: none; }
-.light-sliders { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 32px; }
-.light-slider { display: grid; gap: 6px; }
-.light-slider > span { display: flex; justify-content: space-between; gap: 16px; font-size: 12px; }
-.light-slider output { font-size: 11px; }
-.light-slider input { margin: 0; }
-@media (max-width: 700px) { .light-body { grid-template-columns: 1fr; gap: 20px; } .light-sliders { gap: 18px; } }
+.light-memory { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding-top: 15px; margin-top: auto; }
+.light-memory small { grid-column: 1 / -1; font-size: 9px; line-height: 1.5; color: var(--muted); }
+.scene-workspace:not([data-composition='sculpture']) .light-scroll { max-height: 430px; }

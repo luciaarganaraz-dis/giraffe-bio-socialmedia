@@ -1,6 +1,6 @@
 import {
   AgXToneMapping, ACESFilmicToneMapping, Box3, Color, Group,
-  OrthographicCamera, PCFSoftShadowMap, PMREMGenerator, Scene, Vector2, Vector3, WebGLRenderer,
+  OrthographicCamera, PCFShadowMap, PMREMGenerator, Scene, Vector2, Vector3, WebGLRenderer,
 } from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
@@ -23,7 +23,7 @@ export async function createStudio(host: HTMLElement) {
   renderer.toneMapping = ACESFilmicToneMapping
   renderer.toneMappingExposure = 1.35
   renderer.shadowMap.enabled = true
-  renderer.shadowMap.type = PCFSoftShadowMap
+  renderer.shadowMap.type = PCFShadowMap
   host.append(renderer.domElement)
   renderer.domElement.setAttribute('aria-hidden', 'true')
 
@@ -231,6 +231,7 @@ export async function createStudio(host: HTMLElement) {
       sculptureSurface.dispose()
       sculptureBackground.dispose()
       backdrop.dispose()
+      lighting.dispose()
       stone.dispose()
       environmentMap.dispose()
       renderer.dispose()

@@ -1,6 +1,7 @@
 import { chromium } from 'playwright-core'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
+import { revealLightControl, setLightSlider } from './light-test-controls.mjs'
 
 mkdirSync('.review', { recursive: true })
 const browser = await chromium.launch({ channel: 'chrome', headless: true })
@@ -37,8 +38,7 @@ try {
   const light = await lightPixels()
   assert.ok(light.flank > light.front * 2, 'Raking light must separate the bright flank from the dark front')
   assert.ok(light.front > 5, 'The isologo must remain readable in the shadow')
-  await page.locator('#light-fill').fill('0')
-  await page.locator('#light-fill').dispatchEvent('input')
+  await setLightSlider(page, 'fill', 0)
   const noFill = await lightPixels()
   assert.ok(noFill.front < light.front * .6, 'Fill must reveal real detail in the dark front')
   await page.locator('#reset-light').click()
@@ -56,6 +56,7 @@ try {
   assert.ok(json.nodes.some(node => node.name?.startsWith('Monolito')))
   assert.equal(json.materials.length, 1)
   assert.equal(json.nodes.filter(node => node.name?.startsWith('Lateral')).length, 0)
+  await revealLightControl(page, 'position')
   await page.locator('#light-position').press('ArrowRight')
   assert.equal(JSON.parse(await page.locator('#viewer').getAttribute('data-light')).x, 85)
   assert.equal(await page.locator('#viewer').getAttribute('data-piece'), 'sculpture')

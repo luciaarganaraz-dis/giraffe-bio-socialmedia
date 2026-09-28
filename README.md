@@ -19,7 +19,10 @@ Abrir **http://127.0.0.1:5187**. El servidor usa un puerto fijo y sólo escucha 
 - Alternar entre Escultura (vista inicial), el logo completo y las cinco piezas del isotipo. La escultura integra un solo símbolo, con partes hundidas y salientes en la misma roca oscura.
 - Ajustar la profundidad para acentuar el vaciado y el relieve. En Logo completo e Isotipo también se puede elegir piedra, grafito, cobre o marfil; la escultura mantiene un único material de roca.
 - Pausar el movimiento y restablecer la vista.
-- Trabajar la luz en el panel debajo del visor: arrastrar el punto para mover la fuente principal; ajustar intensidad, relleno, contraluz y exposición. Las flechas del teclado también mueven el punto.
+- Trabajar la luz en el panel «Luz del estudio»: elegir Principal, Relleno, Contraluz o Foco de acento para ajustar cada fuente. El punto arrastrable mueve la principal; también responde a las flechas del teclado.
+- Cada luz tiene encendido, intensidad hasta 300%, color, posición en tres ejes y sombras. El foco de acento suma apertura del haz, difusión del borde y punto de enfoque horizontal/vertical. Arranca apagado.
+- «Ambiente / sombras» controla luz ambiente, giro del entorno, intensidad y suavidad de sombras, y si las luces siguen la cámara. La exposición completa los 38 ajustes. Podés arrastrar los controles o escribir valores exactos.
+- Probar Referencia, Suave, Contraste o Cálida/fría. «Guardar mi luz» guarda una configuración en este navegador; «Recuperar» la restaura incluso después de cerrar y volver a abrir la página.
 - «Restablecer luz» recupera los valores iniciales sin cambiar el encuadre. Los ajustes se conservan al cambiar de material o pieza.
 - Descargar PNG: 2160 × 2700 para la escultura (4:5), 3000 × 1500 para el logo o 2048 × 2048 para el isotipo. Conserva el fondo y la iluminación elegida; transparencia opcional.
 - Descargar GLB: geometría y materiales, para abrir en Blender u otra herramienta 3D. El GLB de piedra incorpora mapas de color, relieve y rugosidad/metallicidad horneados a 2048 px desde el acabado de piedra gris. El grano fino puede verse más suave que en el shader vivo. El GLB contiene la pieza centrada; no incorpora el fondo, la cámara ni la iluminación del estudio.
@@ -34,6 +37,7 @@ El movimiento automático se desactiva al manipular la pieza. Se respeta la pref
 - `src/studio.ts`: cámara, iluminación, interacción y captura.
 - `src/materials.ts`: acabados de la pieza.
 - `src/lighting.ts` y `src/light-controls.ts`: luces del estudio y panel de edición.
+- `src/light-settings.ts` y `src/light-markup.ts`: valores iniciales, combinaciones y controles de las cuatro luces.
 - `src/stone/backdrop.ts`: pared de piedra con relieve, material y sombras.
 - `src/styles/`: composición y colores del estudio.
 - `src/sculpture/`: monolito de geometría irregular, isologo tallado, fondo gris y exportación con materiales PBR.
@@ -76,6 +80,8 @@ La escultura tiene un fondo gris de estudio. En los modos Logo completo e Isotip
 El PNG incluye fondo e iluminación. Activar «PNG con fondo transparente» elimina temporalmente la pared durante la captura y luego la restaura en el visor. El GLB sigue exportando únicamente la pieza con sus materiales, sin pared, luces ni cámara.
 
 `pnpm check:lighting` verifica cambios reales de luminosidad, arrastre y teclado, restablecimiento, y PNG con fondo y transparencia. Guarda capturas en `.review/lighting-*.png` y una pieza lista para usar en `exports/giraffe-bio-logo-stone-fondo.png`.
+
+`pnpm check:light-studio` comprueba las cuatro fuentes por separado, colores, posiciones, foco, sombras por luz, suavidad, ambiente y luces fijas o ligadas a la cámara. Verifica entrada numérica, guardado y recuperación tras recargar, y que el PNG conserve la luz elegida. Guarda evidencia en `.review/light-studio-*`.
 
 ## Escultura mineral
 

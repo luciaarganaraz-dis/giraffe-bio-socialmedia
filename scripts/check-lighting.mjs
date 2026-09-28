@@ -1,6 +1,7 @@
 import { chromium } from 'playwright-core'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
+import { revealLightControl, setLightSlider } from './light-test-controls.mjs'
 
 mkdirSync('.review', { recursive: true })
 const browser = await chromium.launch({ channel: 'chrome', headless: true })
@@ -16,10 +17,7 @@ const pixels = () => page.locator('#viewer canvas').evaluate(canvas => {
   for (let i = 0; i < data.length; i += 64) { light += (data[i] + data[i + 1] + data[i + 2]) / 3; samples++ }
   return { mean: light / samples, cornerAlpha: data[3], width: canvas.width, height: canvas.height }
 })
-const slider = async (name, value) => {
-  await page.locator(`#light-${name}`).fill(String(value))
-  await page.locator(`#light-${name}`).dispatchEvent('input')
-}
+const slider = (name, value) => setLightSlider(page, name, value)
 const pngInfo = async path => page.evaluate(async src => {
   const image = new Image(); image.src = src; await image.decode()
   const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height
@@ -35,7 +33,7 @@ try {
   const baseline = await pixels()
   assert.equal(baseline.cornerAlpha, 255, 'The stone backdrop must be in the actual scene')
   await page.screenshot({ path: '.review/lighting-default.png', fullPage: true })
-  await slider('intensity', 0); await slider('fill', 0); await slider('rim', 0)
+  await slider('intensity', 0); await slider('fill', 0); await slider('rim', 0); await slider('ambient', 0)
   const dark = await pixels()
   assert.ok(dark.mean < baseline.mean * .25, 'Turning off all lights must darken both logo and stone wall')
   await slider('fill', 60)
@@ -53,6 +51,8 @@ try {
   await slider('rim', 200)
   assert.ok((await pixels()).mean > noRim.mean + .1, 'Rim light must reach the logo')
   await page.locator('#reset-light').click()
+  await revealLightControl(page, 'position')
+  await page.locator('#light-position').scrollIntoViewIfNeeded()
   const pad = await page.locator('#light-position').boundingBox()
   await page.mouse.move(pad.x + pad.width * .3, pad.y + pad.height * .15)
   await page.mouse.down()
