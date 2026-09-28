@@ -5,7 +5,7 @@ import { type readLogo } from '../logo'
 import { sculptureRock } from './rock'
 import { reliefTools } from './relief'
 
-/** One connected stone: remove the recessed lobes and unite the raised ones. */
+/** One connected stone with the whole isologo recessed into its front. */
 export function createSculpture(shapes: ReturnType<typeof readLogo>, depth: number, material: Material) {
   const sculpture = new Group()
   sculpture.name = 'Giraffe bio. — escultura mineral'
@@ -18,6 +18,7 @@ export function createSculpture(shapes: ReturnType<typeof readLogo>, depth: numb
   let solid = new Brush(geometry, material)
   solid.updateMatrixWorld()
   for (const [parts, operation] of [[tools.recessed, SUBTRACTION], [tools.raised, ADDITION]] as const) {
+    if (!parts.length) continue
     const combined = mergeGeometries(parts)!
     const tool = new Brush(combined, material)
     tool.updateMatrixWorld()

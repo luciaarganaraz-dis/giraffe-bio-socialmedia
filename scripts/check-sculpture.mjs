@@ -87,7 +87,7 @@ try {
   const exportedWalls = JSON.parse(await page.locator('body').getAttribute('data-walls'))
   const exportedContours = JSON.parse(await page.locator('body').getAttribute('data-contours'))
   exportedContours.forEach(contour => assert.equal(contour.coverage, 1, 'Every SVG lobe must remain whole in the exported mesh'))
-  exportedRelief.forEach(probe => assert.ok(probe.recessed ? probe.z < .65 : probe.z > 1.35))
+  exportedRelief.forEach(probe => assert.ok(probe.recessed && probe.z < .65))
   for (const query of ['side', 'side&neutral', 'front&neutral']) {
     await page.goto(`http://127.0.0.1:5187/__sculpture-review?${query}`)
     await page.waitForSelector('body[data-ready="true"]')
@@ -99,9 +99,9 @@ try {
   const geometry = JSON.parse(await page.locator('body').textContent())
   geometry.forEach(({ probes, meshes, contours }) => {
     assert.equal(meshes, 1)
-    assert.equal(probes.filter(probe => probe.recessed).length, 3)
-    assert.equal(probes.filter(probe => !probe.recessed).length, 2)
-    probes.forEach(probe => assert.ok(probe.recessed ? probe.change < -.12 : probe.change > .12))
+    assert.equal(probes.filter(probe => probe.recessed).length, 5)
+    assert.equal(probes.filter(probe => !probe.recessed).length, 0)
+    probes.forEach(probe => assert.ok(probe.change < -.12, 'Every lobe must be carved into the stone'))
     contours.forEach(contour => {
       assert.ok(contour.sampled > 60)
       assert.equal(contour.coverage, 1, 'The SVG footprint must have no missing or occluded fragments at any depth')
@@ -110,7 +110,7 @@ try {
   geometry[0].probes.forEach((probe, i) => {
     assert.ok(Math.abs(geometry[2].probes[i].change) > Math.abs(probe.change) + .35)
   })
-  for (const [wall, minimum] of Object.entries({ rock: .15, raised: .02, recessed: .02 })) {
+  for (const [wall, minimum] of Object.entries({ rock: .15, recessedRight: .01, recessed: .02 })) {
     const profile = geometry[1].walls[wall]
     assert.ok(profile.samples.every(sample => Number.isFinite(sample.x)), `${wall}: every side ray must hit a wall`)
     assert.ok(profile.departure > minimum, `${wall}: the wall must break its straight extrusion through the depth`)

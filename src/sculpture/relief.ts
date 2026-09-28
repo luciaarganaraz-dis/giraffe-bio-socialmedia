@@ -7,7 +7,7 @@ import { noise } from '../stone/erosion-noise'
 import { carvedSidewallWear } from './sidewall'
 import { ISO_PLACEMENT, outlineDirection } from './placement'
 
-/** Five original SVG lobes, in a single placement; left/top sink into the rock. */
+/** All five original SVG lobes are carved into the same stone. */
 export function reliefTools(shapes: ReturnType<typeof readLogo>, depth: number, material: Material) {
   const logo = createLogo(shapes, 'symbol', 100, [material, material])
   const atlas = atlasModel(logo, 2048)
@@ -20,9 +20,8 @@ export function reliefTools(shapes: ReturnType<typeof readLogo>, depth: number, 
   for (const [index, child] of (atlas.children as Mesh[]).entries()) {
     const bounds = new Box3().setFromObject(child)
     const center = bounds.getCenter(new Vector3())
-    const inset = center.x < -.3 || center.y > .25
-    const lower = inset ? 1.03 - (.22 + depth * .005) : .45
-    const upper = inset ? 2.3 : 1.03 + (.18 + depth * .005)
+    const lower = 1.03 - (.22 + depth * .005)
+    const upper = 2.3
     const outline = entries[index].shape.getPoints(20).map(point => ({
       x: (point.x * .01 + child.position.x) * placement.scale + placement.x,
       y: (point.y * .01 + child.position.y) * placement.scale + placement.y,
@@ -44,7 +43,7 @@ export function reliefTools(shapes: ReturnType<typeof readLogo>, depth: number, 
       const weathering = noise(x * 2.1, y * 2.1, z * 2.1, 821) * .045
         + noise(x * 6.8, y * 6.8, z * 6.8, 531) * .012
       const [nx, ny] = direction(x, y)
-      const wear = carvedSidewallWear(x, y, z, depth, inset)
+      const wear = carvedSidewallWear(x, y, z, depth, true)
       positions.setXYZ(i, x + nx * wear, y + ny * wear, z + weathering)
       uv.setX(i, .5 + uv.getX(i) * .5)
     }
@@ -53,9 +52,8 @@ export function reliefTools(shapes: ReturnType<typeof readLogo>, depth: number, 
     toCreasedNormals(geometry, Math.PI / 3)
     geometry.scale(.01, .01, .01)
     geometry.clearGroups()
-    const target = inset ? recessed : raised
-    target.push(geometry)
-    probes.push({ x: center.x * placement.scale + placement.x, y: center.y * placement.scale + placement.y, recessed: inset })
+    recessed.push(geometry)
+    probes.push({ x: center.x * placement.scale + placement.x, y: center.y * placement.scale + placement.y, recessed: true })
   }
   return { recessed, raised, probes }
 }

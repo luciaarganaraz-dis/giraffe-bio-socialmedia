@@ -88,3 +88,12 @@ El GLB incluye la geometría y sus materiales; la iluminación, la cámara y el 
 - Frente, vista de tres cuartos, perfil y exportación revisados visualmente. Las paredes conservan variación física a través del espesor. PNG y GLB actualizados; GLB de aproximadamente 12.2 MB, una malla y un material.
 - `pnpm check:sculpture`, `pnpm check` y `pnpm build` correctos, sin errores de consola. Se restauraron en el visor los valores de luz que la diseñadora estaba usando: posición horizontal 50, intensidad 90 y exposición 106.
 - Movimiento conservado: giro lento con flotación sutil.
+
+
+## Isologo completamente hundido — 28 de septiembre de 2026
+
+- Las cinco formas del SVG ahora se sustraen de la roca. Se conserva un único isologo, una malla, un material y los costados fracturados.
+- Las cinco superficies quedan por debajo de la piedra en profundidades 24, 78 y 130. A profundidad 78, el vaciado mide entre 0.49 y 0.76 unidades respecto de la roca original. Los 574 puntos del dibujo llegan al fondo esperado; la exportación GLB conserva los mismos resultados.
+- Revisados el frente sin textura y el acercamiento del local con la luz de la diseñadora restaurada y profundidad 28. Captura sin controles en `exports/giraffe-bio-isologo-hundido.png` (518 × 550). PNG general de 2160 × 2700 y GLB actualizados, este último de aproximadamente 13.6 MB.
+- `pnpm check:sculpture`, `pnpm check` y `pnpm build` correctos. Controles de luz, exportación y transparencia verificados, sin errores de consola en las pruebas.
+- Movimiento pausado para la captura; se conserva el giro lento con flotación sutil al activarlo.

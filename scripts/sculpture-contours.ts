@@ -1,4 +1,4 @@
-import { Box3, MeshStandardMaterial, Raycaster, Vector3, type Object3D } from 'three'
+import { MeshStandardMaterial, Raycaster, Vector3, type Object3D } from 'three'
 import { createLogo, disposeLogo, type readLogo } from '../src/logo'
 import { ISO_PLACEMENT } from '../src/sculpture/placement'
 
@@ -11,13 +11,12 @@ export function sculptureContours(model: Object3D, shapes: ReturnType<typeof rea
   const ray = new Raycaster(), down = new Vector3(0, 0, -1)
   const placement = ISO_PLACEMENT
   const reports = original.children.map((child, index) => {
-    const localCenter = new Box3().setFromObject(child).getCenter(new Vector3())
-    const recessed = localCenter.x < -.3 || localCenter.y > .25
+    const recessed = true
     const polygon = entries[index].shape.getPoints(20).map(point => ({
       x: (point.x * .01 + child.position.x) * placement.scale + placement.x,
       y: (point.y * .01 + child.position.y) * placement.scale + placement.y,
     }))
-    const expectedZ = recessed ? 1.03 - (.22 + depth * .005) : 1.03 + (.18 + depth * .005)
+    const expectedZ = 1.03 - (.22 + depth * .005)
     const minX = Math.min(...polygon.map(p => p.x)), maxX = Math.max(...polygon.map(p => p.x))
     const minY = Math.min(...polygon.map(p => p.y)), maxY = Math.max(...polygon.map(p => p.y))
     const step = Math.max(maxX - minX, maxY - minY) / 18
