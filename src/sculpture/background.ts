@@ -8,8 +8,8 @@ export function createSculptureBackground() {
     fragmentShader: `varying vec2 vUv;
       void main() {
         float grain = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - .5;
-        float shade = mix(.67, .22, smoothstep(0., 1., vUv.y));
-        shade += .07 * (1. - abs(vUv.x - .5) * 2.) + grain * .025;
+        float shade = .32 + .31 * (1. - smoothstep(0., 1., vUv.y)) * (1. - .35 * vUv.x);
+        shade += grain * .025;
         gl_FragColor = vec4(vec3(shade), 1.);
       }`,
   })

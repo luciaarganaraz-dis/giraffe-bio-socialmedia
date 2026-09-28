@@ -7,7 +7,7 @@
 .light-position-control { display: flex; align-items: center; gap: 16px; }
 .light-position-caption { display: grid; gap: 8px; font-size: 12px; }
 .light-position-caption small { font-size: 10px; color: var(--muted); }
-.light-pad { --light-x: 30%; --light-y: 15%; position: relative; width: 104px; height: 104px; flex-shrink: 0; overflow: hidden; border: 1px solid var(--rule); background: var(--stage); touch-action: none; cursor: crosshair; }
+.light-pad { --light-x: 90%; --light-y: 27.5%; position: relative; width: 104px; height: 104px; flex-shrink: 0; overflow: hidden; border: 1px solid var(--rule); background: var(--stage); touch-action: none; cursor: crosshair; }
 .light-pad::before, .light-pad::after { content: ''; position: absolute; background: var(--rule); pointer-events: none; }
 .light-pad::before { top: 50%; left: 0; width: 100%; height: 1px; }
 .light-pad::after { left: 50%; top: 0; height: 100%; width: 1px; }

@@ -35,3 +35,12 @@ El GLB incluye la geometría y sus materiales; la iluminación, la cámara y el 
 - El selector de materiales aparece en Logo completo e Isotipo; Escultura conserva un material continuo. Ambos modos anteriores mantienen sus 17 y 5 mallas.
 - Movimiento reducido revisado como composición estática. `pnpm check:sculpture`, TypeScript y compilación de producción correctos; sin errores de consola en las comprobaciones.
 - El GLB conserva geometría y material; el detalle fino del horneado es más suave, especialmente en las paredes estrechas. No incluye el fondo ni la iluminación.
+
+## Luz de la referencia — 28 de septiembre de 2026
+
+- Principal blanca rasante desde arriba/derecha; relleno frontal suave, contraluz reducido y sombras completas en la escultura. Fondo gris con más claridad hacia abajo/izquierda.
+- Inicio y restablecimiento: posición 80/45, intensidad 100%, relleno 22%, contraluz 35%, exposición 100%. El control sigue respondiendo al arrastre y al teclado.
+- Misma geometría y mismo material de piedra. En el encuadre inicial, luminosidad media del frente 17.36 y del lateral iluminado 78.51 (escala 0–255). Sin relleno el frente baja a 1.16; restablecer recupera exactamente el valor inicial.
+- PNG de escultura actualizado y revisado. La exportación transparente mantiene el alfa y restaura el fondo. La iluminación pertenece al estudio y al PNG; no cambia el material del GLB.
+- `pnpm check:sculpture`, `pnpm check:lighting`, `pnpm check` y `pnpm build` correctos. Sin errores de consola. Los controles también funcionan al volver a Logo completo e Isotipo.
+- Movimiento conservado: giro lento con flotación sutil; composición estática con movimiento reducido.

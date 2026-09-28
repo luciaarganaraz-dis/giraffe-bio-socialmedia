@@ -12,7 +12,7 @@ export function lightControlsMarkup() {
     <div class="light-body"><div class="light-position-control">
       <button id="light-position" type="button" class="light-pad" aria-label="Posición de la luz. Arrastrá el punto o usá las flechas." aria-describedby="light-position-value" disabled>
         <span class="light-orbit" aria-hidden="true"></span><span class="light-point" aria-hidden="true"></span>
-      </button><div class="light-position-caption"><span>Posición</span><small id="light-position-value">Izquierda · Arriba</small><small>Arrastrá el punto</small></div>
+      </button><div class="light-position-caption"><span>Posición</span><small id="light-position-value">Derecha · Arriba</small><small>Arrastrá el punto</small></div>
     </div><div class="light-sliders">${sliders.map(([id, name, min, max]) => `<label class="light-slider" for="light-${id}"><span>${name}<output id="light-${id}-value" for="light-${id}">${DEFAULT_LIGHT[id]}%</output></span><input id="light-${id}" type="range" min="${min}" max="${max}" value="${DEFAULT_LIGHT[id]}" disabled /></label>`).join('')}</div></div>
   </section>`
 }

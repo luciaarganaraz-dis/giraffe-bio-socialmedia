@@ -8,6 +8,18 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 1100 }, re
 const errors = []
 page.on('pageerror', error => errors.push(error.message))
 page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()) })
+// Fixed studio crop: compare the recessed front with the illuminated right flank.
+const lightPixels = () => page.locator('#viewer canvas').evaluate(canvas => {
+  const copy = document.createElement('canvas'); copy.width = canvas.width; copy.height = canvas.height
+  const ctx = copy.getContext('2d'); ctx.drawImage(canvas, 0, 0)
+  const sample = (x, y, w, h) => {
+    const data = ctx.getImageData(x * copy.width, y * copy.height, w * copy.width, h * copy.height).data
+    let total = 0
+    for (let i = 0; i < data.length; i += 4) total += (data[i] + data[i + 1] + data[i + 2]) / 3
+    return total / (data.length / 4)
+  }
+  return { front: sample(.37, .38, .1, .24), flank: sample(.62, .3, .035, .3) }
+})
 const glbJson = path => {
   const buffer = readFileSync(path)
   assert.equal(buffer.toString('utf8', 0, 4), 'glTF')
@@ -22,6 +34,16 @@ try {
   await page.waitForSelector('#viewer[data-ready="true"]')
   assert.equal(await page.locator('button[data-piece="sculpture"]').getAttribute('aria-pressed'), 'true')
   assert.equal(await page.locator('#viewer').getAttribute('data-meshes'), '1')
+  const light = await lightPixels()
+  assert.ok(light.flank > light.front * 2, 'Raking light must separate the bright flank from the dark front')
+  assert.ok(light.front > 5, 'The isologo must remain readable in the shadow')
+  await page.locator('#light-fill').fill('0')
+  await page.locator('#light-fill').dispatchEvent('input')
+  const noFill = await lightPixels()
+  assert.ok(noFill.front < light.front * .6, 'Fill must reveal real detail in the dark front')
+  await page.locator('#reset-light').click()
+  const resetLight = await lightPixels()
+  assert.ok(Math.abs(resetLight.front - light.front) < .01)
   await page.screenshot({ path: '.review/sculpture-studio.png', fullPage: true })
   await page.locator('canvas').screenshot({ path: '.review/sculpture-source.png' })
   await download('image', 'exports/giraffe-bio-escultura.png')
@@ -35,7 +57,7 @@ try {
   assert.equal(json.materials.length, 1)
   assert.equal(json.nodes.filter(node => node.name?.startsWith('Lateral')).length, 0)
   await page.locator('#light-position').press('ArrowRight')
-  assert.equal(JSON.parse(await page.locator('#viewer').getAttribute('data-light')).x, -35)
+  assert.equal(JSON.parse(await page.locator('#viewer').getAttribute('data-light')).x, 85)
   assert.equal(await page.locator('#viewer').getAttribute('data-piece'), 'sculpture')
   await page.locator('#light-intensity').fill('160')
   await page.locator('#light-intensity').dispatchEvent('input')
@@ -76,7 +98,7 @@ try {
     assert.ok(Math.abs(geometry[2].probes[i].change) > Math.abs(probe.change) + .35)
   })
   assert.deepEqual(errors, [])
-  const report = { meshes: json.meshes.length, maps: json.images.length, portrait: [2160, 2700], transparentAlpha: alpha, geometry, exportedRelief, glbBytes: readFileSync('exports/giraffe-bio-escultura.glb').length, errors }
+  const report = { meshes: json.meshes.length, maps: json.images.length, portrait: [2160, 2700], transparentAlpha: alpha, light, noFill, resetLight, geometry, exportedRelief, glbBytes: readFileSync('exports/giraffe-bio-escultura.glb').length, errors }
   writeFileSync('.review/sculpture-report.json', JSON.stringify(report, null, 2))
   console.log(JSON.stringify(report, null, 2))
 } finally { await browser.close() }

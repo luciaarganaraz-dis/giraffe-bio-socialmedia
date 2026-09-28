@@ -1,7 +1,7 @@
 import { AmbientLight, Camera, DirectionalLight, Group, Scene, Vector3, type WebGLRenderer } from 'three'
 import { CARVED_LOOK as LOOK } from './stone/carved-look'
 
-export const DEFAULT_LIGHT = { x: -40, y: 70, intensity: 100, fill: 30, rim: 100, exposure: 100 }
+export const DEFAULT_LIGHT = { x: 80, y: 45, intensity: 100, fill: 22, rim: 35, exposure: 100 }
 export type LightSettings = typeof DEFAULT_LIGHT
 
 /** The control follows the camera: left on the pad always lights from the left. */
@@ -26,14 +26,18 @@ export function createLighting(renderer: WebGLRenderer, scene: Scene, stoneLight
     const move = (light: DirectionalLight, x: number, y: number, z: number) => {
       light.position.copy(position.set(x, y, z).applyQuaternion(camera.quaternion))
     }
-    move(stoneKey, settings.x / 10, settings.y / 10, 7)
+    // Low fill and a grazing key keep the carved face dark, with a bright right edge.
+    move(stoneKey, settings.x / 10, settings.y / 10, sculpture ? 3 : 7)
+    stoneKey.shadow.intensity = sculpture ? 1 : .48
+    stoneKey.shadow.normalBias = sculpture ? .002 : .004
     move(key, settings.x / 10, settings.y / 10, 7)
-    move(stoneFill, 1, -3, 5)
-    move(stoneRim, 5, 2, -4)
+    if (sculpture) move(stoneFill, -5, 2, 7)
+    else move(stoneFill, 1, -3, 5)
+    move(stoneRim, 5, sculpture ? 4 : 2, -4)
     move(rim, 6, 2, -4)
-    stoneKey.intensity = (sculpture ? 5 : LOOK.keyLight) * settings.intensity / 100
-    stoneFill.intensity = (sculpture ? .1 : 1) * settings.fill / 100
-    stoneRim.intensity = (sculpture ? 3.2 : LOOK.rimLight) * settings.rim / 100
+    stoneKey.intensity = (sculpture ? 7.5 : LOOK.keyLight) * settings.intensity / 100
+    stoneFill.intensity = (sculpture ? 6 : 1) * settings.fill / 100
+    stoneRim.intensity = (sculpture ? .8 : LOOK.rimLight) * settings.rim / 100
     key.intensity = 3.5 * settings.intensity / 100
     rim.intensity = 2.2 * settings.rim / 100
     ambient.intensity = .9 * settings.fill / 30
